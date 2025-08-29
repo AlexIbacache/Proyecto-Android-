@@ -27,5 +27,4 @@ El objetivo es organizar la información de repuestos y tenerla disponible de ma
 - **Intents**: para navegación y paso de datos (extras).  
 - **Firebase Authentication**: gestión de usuarios (opcional).  
 - **Firebase Firestore / Realtime Database**: almacenamiento de datos de repuestos.  
-- **RecyclerView**: mostrar listas de registros.  
-- **Firebase Storage (opcional)**: guardar fotos de repuestos o facturas.  
+- **RecyclerView**: mostrar listas de registros.
