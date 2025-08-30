@@ -1,4 +1,4 @@
-# Nombre de la App: MachineManagement
+# Nombre de la App: SparePartsM (SPM)
 
 ## 📌 Propósito
 MachineManagement es una aplicación Android orientada a talleres mecánicos, que permite **registrar y gestionar repuestos utilizados en maquinarias**.  
