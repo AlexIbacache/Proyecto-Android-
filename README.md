@@ -1,4 +1,4 @@
-# Nombre de la App: SparePartsM (SPM)
+a# Nombre de la App: SparePartsM (SPM)
 
 ## 📌 Propósito
 SparePartsM (SPM) es una aplicación Android orientada a talleres mecánicos, que permite **registrar y gestionar repuestos utilizados en maquinarias**.  
