@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.proyectoandroid"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.proyectoandroid"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -33,6 +33,8 @@ android {
 
 dependencies {
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
     implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
     implementation(libs.appcompat)
     implementation(libs.material)
