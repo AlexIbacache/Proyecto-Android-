@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">ProyectoAndroid</string>
     <string name="default_web_client_id">TU_CLIENT_ID.apps.googleusercontent.com</string>
+    <string-array name="maquinarias_array">
+        <item>Selecciona una maquinaria...</item>
+        <item>Excavadora Caterpillar</item>
+        <item>Tractor John Deere</item>
+        <item>Grúa Liebherr</item>
+        <item>Perforadora Atlas Copco</item>
+    </string-array>
 </resources>

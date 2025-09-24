@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="32dp"
-    android:background="#ECEFF1"
+    android:padding="24dp"
+    android:background="#FFFFFF"
     tools:context=".MenuActivity">
 
     <TextView
@@ -15,27 +15,35 @@
         android:layout_height="wrap_content"
         android:text="Menú Principal"
         android:textSize="24sp"
-        android:textColor="#263238"
+        android:textColor="?android:attr/textColorPrimary"
         android:textStyle="bold"
         android:gravity="center"
+        android:letterSpacing="0.05"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="24dp"
         tools:ignore="HardcodedText" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnMaquinaria"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:minHeight="56dp"
         android:text="Ver Maquinaria"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#121212"
+        app:elevation="4dp"
         app:icon="@drawable/ic_maquina"
         app:iconGravity="textStart"
         app:iconPadding="16dp"
-        android:textAllCaps="false"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintStart_toStartOf="parent"
+        app:iconTint="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
         tools:ignore="HardcodedText" />
 
     <com.google.android.material.button.MaterialButton
@@ -43,14 +51,19 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Registrar Reparación"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:minHeight="56dp"
+        app:backgroundTint="#121212"
+        app:elevation="4dp"
         app:icon="@drawable/ic_repuesto"
         app:iconGravity="textStart"
         app:iconPadding="16dp"
-        android:textAllCaps="false"
+        app:iconTint="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@id/btnMaquinaria"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         tools:ignore="HardcodedText" />
 
     <com.google.android.material.button.MaterialButton
@@ -58,46 +71,68 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Ver Reportes"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:minHeight="56dp"
+        app:backgroundTint="#121212"
+        app:elevation="4dp"
         app:icon="@drawable/ic_lista"
         app:iconGravity="textStart"
         app:iconPadding="16dp"
-        android:textAllCaps="false"
+        app:iconTint="#FFFFFF"
         app:layout_constraintTop_toBottomOf="@id/btnReparacion"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         tools:ignore="HardcodedText" />
 
-    <ImageView
-        android:id="@+id/imgLogo"
+    <!-- Contenedor para Logo con Bordes Suavizados (círculo con sombra difusa, sin stroke duro) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardLogo"
         android:layout_width="240dp"
-        android:layout_height="253dp"
-        android:contentDescription="Logo"
-        android:src="@drawable/ic_sparepartsm"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="240dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="#121212"
+        app:cardElevation="8dp"
+        app:cardCornerRadius="120dp"
+        app:layout_constraintBottom_toTopOf="@id/btnVolver"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.8"
-        app:layout_constraintHorizontal_bias="0.5"
-        tools:ignore="HardcodedText" />
+        app:layout_constraintTop_toBottomOf="@id/btnReporte"
+        app:layout_constraintVertical_bias="0.5"
+        tools:ignore="RtlHardcoded,HardcodedSize">
+
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:contentDescription="Logo SparePartsM Dorado"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_sparepartsm"
+            tools:ignore="HardcodedText" />
+
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVolver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:backgroundTint="#B0BEC5"
-        android:minWidth="72dp"
-        android:minHeight="36dp"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:text="Cerrar Sesion"
+        android:layout_marginBottom="56dp"
+        android:minHeight="48dp"
+        android:text="Cerrar Sesión"
         android:textAllCaps="false"
-        android:textColor="#263238"
+        android:textColor="#FFFFFF"
         android:textSize="14sp"
+        app:backgroundTint="#F44336"
+        app:elevation="4dp"
+        app:icon="@drawable/ic_exit"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="HardcodedText" />
 

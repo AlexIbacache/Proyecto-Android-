@@ -38,22 +38,22 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // Ajusta el nombre si es necesario
 
-        mAuth = FirebaseAuth.getInstance();
+        //mAuth = FirebaseAuth.getInstance();
 
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
-
+/*
         // Configurar Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // Debe estar en strings.xml
                 .requestEmail()
                 .build();
-
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
+*/
         btnLogin.setOnClickListener(v -> {
+           /*
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString();
 
@@ -68,12 +68,16 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            loginWithEmailPassword(email, password);
+            */
+            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+            //loginWithEmailPassword(email, password);
         });
 
-        btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
+        //btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
     }
-
+/*
     private void loginWithEmailPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -138,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                     });
         }
     }
-
+*/
     private void goToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
         startActivity(intent);

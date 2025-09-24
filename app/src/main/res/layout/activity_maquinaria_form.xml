@@ -1,43 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="24dp">
+
+        <!-- Título Visual y Elegante -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registro de Maquinaria"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:letterSpacing="0.05"
+            android:elevation="2dp" />
 
         <EditText
             android:id="@+id/etNombreMaquinaria"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:hint="Nombre de la Maquinaria"
+            android:importantForAutofill="yes"
             android:inputType="textPersonName"
-            android:importantForAutofill="yes"/>
+            android:minHeight="48dp" />
 
         <EditText
             android:id="@+id/etNumeroIdentificador"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="Número identificador"
-            android:inputType="text"
             android:importantForAutofill="yes"
-            android:layout_marginTop="16dp"/>
+            android:inputType="text"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <EditText
             android:id="@+id/etFechaIngreso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Fecha de ingreso (dd/mm/yyyy)"
-            android:inputType="date"
-            android:focusable="false"
+            android:layout_marginTop="16dp"
             android:clickable="true"
-            android:layout_marginTop="16dp"/>
+            android:focusable="true"
+            android:hint="Fecha de ingreso (dd/mm/yyyy)"
+            android:inputType="text"
+            android:minHeight="48dp" />
 
         <EditText
             android:id="@+id/etDescripcion"
@@ -48,21 +66,81 @@
             android:minLines="3"
             android:maxLines="5"
             android:gravity="top"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp" />
 
-        <Button
-            android:id="@+id/btnGuardarMaquinaria"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Guardar"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="Partes de la Máquina"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary" />
 
-        <Button
-            android:id="@+id/btnVolverFM"
-            android:layout_width="wrap_content"
+        <!-- NestedScrollView para scroll interno en containerPartes (con bordes para resaltar) -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollPartes"
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/nested_scroll_border"
+            android:fillViewport="true"
+            tools:ignore="SpeakableTextPresentCheck">
+
+            <LinearLayout
+                android:id="@+id/containerPartes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </androidx.core.widget.NestedScrollView>
+
+        <LinearLayout
+            android:id="@+id/containerBotones"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
             android:layout_marginTop="16dp"
-            android:text="Volver" />
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnVolverFM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                app:backgroundTint="#121212"
+                app:elevation="4dp"
+                app:fabSize="mini"
+                app:srcCompat="@android:drawable/ic_menu_revert"
+                app:tint="#FFFFFF"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <Button
+                android:id="@+id/btnGuardarMaquinaria"
+                android:layout_width="202dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#121212"
+                android:elevation="4dp"
+                android:minHeight="56dp"
+                android:text="Guardar"
+                android:textColor="#FFFFFF" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabAgregarParte"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                app:backgroundTint="#121212"
+                app:elevation="4dp"
+                app:fabSize="normal"
+                app:srcCompat="@android:drawable/ic_menu_add"
+                app:tint="#FFFFFF"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+        </LinearLayout>
 
     </LinearLayout>
-</ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
