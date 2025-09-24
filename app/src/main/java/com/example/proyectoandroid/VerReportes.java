@@ -11,14 +11,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class VerReportes extends AppCompatActivity {
-    Button exportExcel;
+    private Button btnVolverM;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ver_reportes);
-        exportExcel = findViewById(R.id.btnExportarExcel);
-        exportExcel.setOnClickListener(v -> {
+        btnVolverM = findViewById(R.id.btnVolverLM);
+        btnVolverM.setOnClickListener(v -> {
             Intent intent = new Intent(VerReportes.this, MenuActivity.class);
             startActivity(intent);
             finish();

@@ -106,8 +106,8 @@
             android:id="@+id/imgLogo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="12dp"
             android:contentDescription="Logo SparePartsM Dorado"
+            android:padding="12dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_sparepartsm"
             tools:ignore="HardcodedText" />
