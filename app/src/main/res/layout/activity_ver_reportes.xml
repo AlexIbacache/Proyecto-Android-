@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvTituloReporte"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Reportes de Reparaciones"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloReporte"
+        app:layout_constraintBottom_toTopOf="@id/btnExportarExcel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TableLayout
+            android:id="@+id/tableReportes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*"
+            android:padding="8dp">
+
+            <!-- Fila encabezado -->
+            <TableRow>
+                <TextView
+                    android:text="Fecha"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Maquinaria"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Parte"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Repuesto"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Cantidad"
+                    android:textStyle="bold"
+                    android:padding="8dp"/>
+            </TableRow>
+
+            <!-- Ejemplo fila 1 -->
+            <TableRow>
+                <TextView
+                    android:text="24/09/2025"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Excavadora"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Motor"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Filtro de aire"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="2"
+                    android:padding="8dp"/>
+            </TableRow>
+
+            <!-- Ejemplo fila 2 -->
+            <TableRow>
+                <TextView
+                    android:text="23/09/2025"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Bulldozer"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Brazo"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Cilindro hidráulico"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="1"
+                    android:padding="8dp"/>
+            </TableRow>
+
+            <!-- Ejemplo fila 3 -->
+            <TableRow>
+                <TextView
+                    android:text="22/09/2025"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Cargador LHD"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Bomba"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="Manguera"
+                    android:padding="8dp"/>
+                <TextView
+                    android:text="4"
+                    android:padding="8dp"/>
+            </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btnExportarExcel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Exportar a Excel"
+        android:backgroundTint="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
