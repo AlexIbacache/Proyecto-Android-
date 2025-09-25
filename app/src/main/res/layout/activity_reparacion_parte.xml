@@ -138,7 +138,7 @@
 
     <Button
         android:id="@+id/btnGuardarParte"
-        android:layout_width="288dp"
+        android:layout_width="248dp"
         android:layout_height="56dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="48dp"
@@ -147,19 +147,25 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <ImageButton
-        android:id="@+id/btnVolverPR"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:background="@color/white"
-        android:backgroundTint="@color/black"
-        android:contentDescription="Volver"
-        android:src="@android:drawable/ic_menu_revert"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.943" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnVolverFM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:minHeight="56dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="Volver"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="@color/black"
+        app:elevation="4dp"
+        app:icon="@android:drawable/ic_menu_revert"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:iconTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText" />
 </androidx.constraintlayout.widget.ConstraintLayout>

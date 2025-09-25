@@ -13,8 +13,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class ConfirmacionCorreo extends AppCompatActivity {
-    Button siguiente;
-    TextView volver, iniciarSesion;
+    private Button siguiente;
+    private TextView volver, iniciarSesion;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class ConfirmacionCorreo extends AppCompatActivity {
             finish();
         });
         volver.setOnClickListener(v -> {
-            Intent intent = new Intent(ConfirmacionCorreo.this, LoginActivity.class);
+            Intent intent = new Intent(ConfirmacionCorreo.this, RegistrarFormActivity.class);
             startActivity(intent);
             finish();
         });

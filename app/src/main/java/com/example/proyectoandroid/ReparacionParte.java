@@ -13,8 +13,11 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class ReparacionParte extends AppCompatActivity {
-    ImageButton btnMotor, btnBomba, btnBrazo, volverpr;
+    private ImageButton btnMotor, btnBomba, btnBrazo;
+    private Button btnVolverFM;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +31,11 @@ public class ReparacionParte extends AppCompatActivity {
         btnMotor = findViewById(R.id.btnMotor);
         btnBrazo = findViewById(R.id.btnBrazo);
         btnBomba = findViewById(R.id.btnBomba);
-        volverpr = findViewById(R.id.btnVolverPR);
+        btnVolverFM = findViewById(R.id.btnVolverFM);
+        btnVolverFM.setOnClickListener(view -> {
+            Intent intent = new Intent(ReparacionParte.this, MenuActivity.class);
+            startActivity(intent);
+        });
         btnMotor.setOnClickListener(view -> {
             Intent intent = new Intent(ReparacionParte.this, ReparacionRepuesto.class);
             startActivity(intent);
@@ -41,11 +48,7 @@ public class ReparacionParte extends AppCompatActivity {
             Intent intent = new Intent(ReparacionParte.this, ReparacionRepuesto.class);
             startActivity(intent);
         });
-        volverpr.setOnClickListener(view -> {
-            Intent intent = new Intent(ReparacionParte.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
-        });
+
         Button guardar = findViewById(R.id.btnGuardarParte);
         guardar.setOnClickListener(view -> {
             Intent intent = new Intent(ReparacionParte.this, MenuActivity.class);

@@ -13,6 +13,9 @@
         android:theme="@style/Theme.ProyectoAndroid"
         tools:targetApi="31">
         <activity
+            android:name=".RegistrarFormActivity"
+            android:exported="false" />
+        <activity
             android:name=".ConfirmacionCorreo"
             android:exported="false" />
         <activity

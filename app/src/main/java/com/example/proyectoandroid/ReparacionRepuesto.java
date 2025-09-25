@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ReparacionRepuesto extends AppCompatActivity {
-
+    private FloatingActionButton btnVolverMenu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,8 +25,8 @@ public class ReparacionRepuesto extends AppCompatActivity {
             AgregarRepuestoDialog dialog = new AgregarRepuestoDialog();
             dialog.show(getSupportFragmentManager(), "AgregarRepuestoDialog");
         });
-        ImageButton volver = findViewById(R.id.btnVolverMenu);
-        volver.setOnClickListener(view -> {
+        btnVolverMenu = findViewById(R.id.btnVolverMenu);
+        btnVolverMenu.setOnClickListener(view -> {
             Intent intent = new Intent(ReparacionRepuesto.this, ReparacionParte.class);
             startActivity(intent);
             finish();

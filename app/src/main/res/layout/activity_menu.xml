@@ -95,7 +95,7 @@
         app:cardBackgroundColor="#121212"
         app:cardElevation="8dp"
         app:cardCornerRadius="120dp"
-        app:layout_constraintBottom_toTopOf="@id/btnVolver"
+        app:layout_constraintBottom_toTopOf="@id/btnCerrarS"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnReporte"
@@ -115,7 +115,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnVolver"
+        android:id="@+id/btnCerrarS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="56dp"

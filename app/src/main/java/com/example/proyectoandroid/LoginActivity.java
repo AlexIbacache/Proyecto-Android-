@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
+
+    private TextView tvRegistrar;
     private SignInButton btnGoogleSignIn;
 
     @Override
@@ -39,11 +42,15 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main); // Ajusta el nombre si es necesario
 
         //mAuth = FirebaseAuth.getInstance();
-
+        tvRegistrar = findViewById(R.id.tvRegistrar);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
+
+        tvRegistrar.setOnClickListener( v -> {Intent intent = new Intent(LoginActivity.this, RegistrarFormActivity.class);
+        startActivity(intent);
+        finish();    });
 /*
         // Configurar Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

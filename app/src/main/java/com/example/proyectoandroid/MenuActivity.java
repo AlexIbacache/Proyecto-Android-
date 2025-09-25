@@ -11,15 +11,16 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MenuActivity extends AppCompatActivity {
-    private Button btnM, btnR, btnV;
+    private Button btnM, btnR, btnVR, btnCerrarS;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_menu);
         btnM = findViewById(R.id.btnMaquinaria);
+        btnCerrarS = findViewById(R.id.btnCerrarS);
         btnR = findViewById(R.id.btnReparacion);
-        btnV = findViewById(R.id.btnReporte);
+        btnVR = findViewById(R.id.btnReporte);
         btnM.setOnClickListener( v ->  {
             Intent intent = new Intent(MenuActivity.this, MaquinariaListActivity.class);
             startActivity(intent);
@@ -30,8 +31,13 @@ public class MenuActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
-        btnV.setOnClickListener( v ->  {
+        btnVR.setOnClickListener( v ->  {
             Intent intent = new Intent(MenuActivity.this, VerReportes.class);
+            startActivity(intent);
+            finish();
+        });
+        btnCerrarS.setOnClickListener( v ->  {
+            Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         });

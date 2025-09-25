@@ -57,7 +57,7 @@
                 android:textColor="#FFFFFF"
                 app:backgroundTint="#121212"
                 app:elevation="4dp"
-                app:icon="@android:drawable/ic_menu_add"
+                app:icon="@drawable/ic_add"
                 app:iconGravity="textStart"
                 app:iconPadding="8dp"
                 app:iconTint="#FFFFFF"
@@ -94,7 +94,6 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Botón Volver (estilo Material consistente) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnVolverLM"
         android:layout_width="wrap_content"
