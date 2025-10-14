@@ -10,6 +10,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MenuActivity extends AppCompatActivity {
     private Button btnM, btnR, btnVR, btnCerrarS;
     @Override
@@ -37,6 +39,7 @@ public class MenuActivity extends AppCompatActivity {
             finish();
         });
         btnCerrarS.setOnClickListener( v ->  {
+            FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();

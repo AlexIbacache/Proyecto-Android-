@@ -19,7 +19,7 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser  ;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 public class LoginActivity extends AppCompatActivity {
@@ -41,26 +41,26 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main); // Ajusta el nombre si es necesario
 
-        //mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();
         tvRegistrar = findViewById(R.id.tvRegistrar);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
 
-        tvRegistrar.setOnClickListener( v -> {Intent intent = new Intent(LoginActivity.this, RegistrarFormActivity.class);
-        startActivity(intent);
-        finish();    });
-/*
+        tvRegistrar.setOnClickListener( v -> {
+            Intent intent = new Intent(LoginActivity.this, RegistrarFormActivity.class);
+            startActivity(intent);
+        });
+
         // Configurar Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // Debe estar en strings.xml
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-*/
+
         btnLogin.setOnClickListener(v -> {
-           /*
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString();
 
@@ -75,21 +75,27 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            */
-            Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
-            startActivity(intent);
-            finish();
-            //loginWithEmailPassword(email, password);
+            loginWithEmailPassword(email, password);
         });
 
-        //btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
+        btnGoogleSignIn.setOnClickListener(v -> signInWithGoogle());
     }
-/*
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            goToMainActivity();
+        }
+    }
+
     private void loginWithEmailPassword(String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        FirebaseUser   user = mAuth.getCurrentUser  ();
+                        FirebaseUser user = mAuth.getCurrentUser();
                         Toast.makeText(LoginActivity.this, "Bienvenido " + user.getEmail(), Toast.LENGTH_SHORT).show();
                         goToMainActivity();
                     } else {
@@ -121,35 +127,18 @@ public class LoginActivity extends AppCompatActivity {
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        FirebaseUser   currentUser   = mAuth.getCurrentUser  ();
-
-        if (currentUser   != null) {
-            // Usuario ya autenticado con email/contraseña, vinculamos la cuenta Google
-            currentUser .linkWithCredential(credential)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser   user = task.getResult().getUser  ();
-                            Toast.makeText(this, "Cuentas vinculadas correctamente", Toast.LENGTH_SHORT).show();
-                            goToMainActivity();
-                        } else {
-                            Toast.makeText(this, "Error al vincular cuentas: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
-        } else {
-            // No hay usuario autenticado, hacemos login normal con Google
-            mAuth.signInWithCredential(credential)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser   user = mAuth.getCurrentUser  ();
-                            Toast.makeText(this, "Bienvenido " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                            goToMainActivity();
-                        } else {
-                            Toast.makeText(this, "Error en autenticación con Google.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Toast.makeText(this, "Bienvenido " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                        goToMainActivity();
+                    } else {
+                        Toast.makeText(this, "Error en autenticación con Google.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
-*/
+
     private void goToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
         startActivity(intent);
