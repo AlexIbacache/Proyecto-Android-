@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -41,11 +42,19 @@ public class MaquinariaFormActivity extends AppCompatActivity {
         containerPartes = findViewById(R.id.containerPartes);
         FloatingActionButton fabAgregarParte = findViewById(R.id.fabAgregarParte);
         FloatingActionButton btnVolverFM = findViewById(R.id.btnVolverFM);
+        Button btnGuardarMaquinaria = findViewById(R.id.btnGuardarMaquinaria);
+
         btnVolverFM.setOnClickListener(v ->{
             Intent intent = new Intent(MaquinariaFormActivity.this, MaquinariaListActivity.class);
             startActivity(intent);
             finish();
         });
+
+        // --- Promesa para el botón Guardar ---
+        btnGuardarMaquinaria.setOnClickListener(v -> {
+            Toast.makeText(MaquinariaFormActivity.this, "Función próximamente...", Toast.LENGTH_SHORT).show();
+        });
+
         // Configurar DatePicker
         etFechaIngreso.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,19 +171,5 @@ public class MaquinariaFormActivity extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    // Ejemplo de método para el botón Guardar (agrega esto en onCreate si se tiene el botón)
-    private void configurarBotonGuardar() {
-        // findViewById(R.id.btnGuardarMaquinaria).setOnClickListener(new View.OnClickListener() {
-        //     @Override
-        //     public void onClick(View v) {
-        //         if (validarFecha()) {
-        //             guardarPartes();
-        //             // Procede a guardar toda la maquinaria...
-        //             Toast.makeText(MaquinariaFormActivity.this, "Maquinaria guardada", Toast.LENGTH_SHORT).show();
-        //         }
-        //     }
-        // });
     }
 }

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.proyectoandroid"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -35,12 +35,15 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation("org.apache.poi:poi:5.4.1")
+    implementation("org.apache.poi:poi-ooxml:5.4.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.fragment.app.DialogFragment;
 
@@ -18,12 +19,11 @@ public class AgregarRepuestoDialog extends DialogFragment {
         builder.setView(view)
                 .setTitle("Agregar repuesto")
                 .setPositiveButton("Aceptar", (dialog, id) -> {
-                    // No guardar nada por ahora
+                    // Promesa para el botón Aceptar
+                    Toast.makeText(getContext(), "Función próximamente...", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancelar", (dialog, id) -> dialog.dismiss());
 
         return builder.create();
     }
 }
-
-
