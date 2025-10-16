@@ -31,7 +31,7 @@ public class VerReportes extends AppCompatActivity {
 
         // --- Promesa para el botón Exportar a Excel ---
         btnExportarExcel.setOnClickListener(v -> {
-            Toast.makeText(VerReportes.this, "Función próximamente...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(VerReportes.this, "Función próximamente: Exportar Excel", Toast.LENGTH_SHORT).show();
         });
     }
 }

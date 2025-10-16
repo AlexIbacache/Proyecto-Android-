@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class RegistrarFormActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private TextInputEditText etNombre;
     private TextInputEditText etEmail;
     private TextInputEditText etPassword;
     private TextInputEditText etConfirmPassword;
@@ -44,6 +46,7 @@ public class RegistrarFormActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
+        etNombre = findViewById(R.id.etNombre);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -52,13 +55,14 @@ public class RegistrarFormActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         btnRegistrarU.setOnClickListener(v -> {
+            String nombre = etNombre.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
             String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-            if (validateInput(email, password, confirmPassword)) {
+            if (validateInput(nombre, email, password, confirmPassword)) {
                 showLoading(true);
-                crearUsuario(email, password);
+                crearUsuario(nombre, email, password);
             }
         });
 
@@ -69,7 +73,12 @@ public class RegistrarFormActivity extends AppCompatActivity {
         });
     }
 
-    private boolean validateInput(String email, String password, String confirmPassword) {
+    private boolean validateInput(String nombre, String email, String password, String confirmPassword) {
+        if (nombre.isEmpty()) {
+            etNombre.setError("El nombre es obligatorio");
+            etNombre.requestFocus();
+            return false;
+        }
         if (email.isEmpty()) {
             etEmail.setError("El correo es obligatorio");
             etEmail.requestFocus();
@@ -103,14 +112,23 @@ public class RegistrarFormActivity extends AppCompatActivity {
         return true;
     }
 
-    private void crearUsuario(String email, String password) {
+    private void crearUsuario(String nombre, String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "createUserWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-                            crearDocumentoUsuarioEnFirestore(user);
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(nombre)
+                                    .build();
+                            user.updateProfile(profileUpdates)
+                                    .addOnCompleteListener(task2 -> {
+                                        if (task2.isSuccessful()) {
+                                            Log.d(TAG, "User profile updated.");
+                                            crearDocumentoUsuarioEnFirestore(user, nombre);
+                                        }
+                                    });
                         }
                     } else {
                         showLoading(false);
@@ -130,10 +148,11 @@ public class RegistrarFormActivity extends AppCompatActivity {
                 });
     }
 
-    private void crearDocumentoUsuarioEnFirestore(FirebaseUser firebaseUser) {
+    private void crearDocumentoUsuarioEnFirestore(FirebaseUser firebaseUser, String nombre) {
         String userId = firebaseUser.getUid();
         Map<String, Object> userData = new HashMap<>();
         userData.put("email", firebaseUser.getEmail());
+        userData.put("nombre", nombre);
 
         db.collection("users").document(userId)
                 .set(userData)

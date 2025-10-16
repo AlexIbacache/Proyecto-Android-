@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
     android:background="#FFFFFF"
     tools:context=".MenuActivity">
 
@@ -13,7 +12,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Menú Principal"
+        android:text="Perfil"
         android:textSize="24sp"
         android:textColor="?android:attr/textColorPrimary"
         android:textStyle="bold"
@@ -22,84 +21,22 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         tools:ignore="HardcodedText" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnMaquinaria"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
-        android:minHeight="56dp"
-        android:text="Ver Maquinaria"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        app:backgroundTint="#121212"
-        app:elevation="4dp"
-        app:icon="@drawable/ic_maquina"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:iconTint="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        tools:ignore="HardcodedText" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnReparacion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Registrar Reparación"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:minHeight="56dp"
-        app:backgroundTint="#121212"
-        app:elevation="4dp"
-        app:icon="@drawable/ic_repuesto"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:iconTint="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/btnMaquinaria"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        tools:ignore="HardcodedText" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnReporte"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Ver Reportes"
-        android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:minHeight="56dp"
-        app:backgroundTint="#121212"
-        app:elevation="4dp"
-        app:icon="@drawable/ic_lista"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:iconTint="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/btnReparacion"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        tools:ignore="HardcodedText" />
-
-    <!-- Contenedor para Logo con Bordes Suavizados (círculo con sombra difusa, sin stroke duro) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardLogo"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
-        android:layout_marginBottom="16dp"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
         app:cardBackgroundColor="#121212"
         app:cardElevation="8dp"
-        app:cardCornerRadius="120dp"
-        app:layout_constraintBottom_toTopOf="@id/btnCerrarS"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:cardCornerRadius="80dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnReporte"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
         tools:ignore="RtlHardcoded,HardcodedSize">
 
         <ImageView
@@ -111,14 +48,44 @@
             android:scaleType="centerInside"
             android:src="@drawable/ic_sparepartsm"
             tools:ignore="HardcodedText" />
-
     </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Correo del Usuario"
+        android:textSize="18sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/cardLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="usuario@email.com"
+        android:textSize="16sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        tools:ignore="HardcodedText" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnCerrarS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="56dp"
         android:minHeight="48dp"
         android:text="Cerrar Sesión"
         android:textAllCaps="false"
@@ -130,27 +97,39 @@
         app:iconGravity="textStart"
         app:iconPadding="8dp"
         app:iconTint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintTop_toBottomOf="@id/tvEmail"
+        app:layout_constraintBottom_toTopOf="@id/tvUbicacion"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
         tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/tvUbicacion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_width="276dp"
+        android:layout_height="53dp"
+        android:drawableStart="@android:drawable/ic_dialog_map"
+        android:drawableTint="@color/black"
+        android:gravity="center"
         android:padding="12dp"
         android:text="Cargando ubicación..."
-        android:textAlignment="center"
         android:textColor="@android:color/black"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        style="@style/CustomBottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_nav_background"
+        app:itemIconTint="@color/bottom_nav_item_color"
+        app:itemTextColor="@color/bottom_nav_item_color"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.981" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
