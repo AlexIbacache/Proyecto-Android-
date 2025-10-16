@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:fitsSystemWindows="true">
 
         <!-- Título Visual y Elegante -->
         <TextView
@@ -82,10 +83,11 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollPartes"
             android:layout_width="match_parent"
-            android:layout_height="350dp"
+            android:layout_height="312dp"
             android:layout_marginBottom="24dp"
             android:background="@drawable/nested_scroll_border"
             android:fillViewport="true"
+            android:paddingBottom="48dp"
             tools:ignore="SpeakableTextPresentCheck">
 
             <LinearLayout
