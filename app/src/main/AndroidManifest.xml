@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -14,9 +16,6 @@
         tools:targetApi="31">
         <activity
             android:name=".RegistrarFormActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ConfirmacionCorreo"
             android:exported="false" />
         <activity
             android:name=".VerReportes"

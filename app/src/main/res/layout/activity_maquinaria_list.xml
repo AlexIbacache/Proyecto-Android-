@@ -117,7 +117,7 @@
         tools:ignore="HardcodedText" />
 
     <Button
-        android:id="@+id/btnModificar"
+        android:id="@+id/btnModificarM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minHeight="56dp"
