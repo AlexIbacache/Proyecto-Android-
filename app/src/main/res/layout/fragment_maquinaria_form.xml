@@ -14,7 +14,6 @@
         android:padding="24dp"
         android:fitsSystemWindows="true">
 
-        <!-- Título Visual y Elegante -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,51 +22,67 @@
             android:textStyle="bold"
             android:textColor="?android:attr/textColorPrimary"
             android:gravity="center"
-            android:layout_marginBottom="24dp"
-            android:letterSpacing="0.05"
-            android:elevation="2dp" />
+            android:layout_marginBottom="24dp" />
 
-        <EditText
-            android:id="@+id/etNombreMaquinaria"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNombreMaquinaria"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Nombre de la Maquinaria"
-            android:importantForAutofill="yes"
-            android:inputType="textPersonName"
-            android:minHeight="48dp" />
+            android:hint="Nombre de la Maquinaria">
 
-        <EditText
-            android:id="@+id/etNumeroIdentificador"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="Número identificador"
-            android:importantForAutofill="yes"
-            android:inputType="text"
-            tools:ignore="TouchTargetSizeCheck" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNombreMaquinaria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/etFechaIngreso"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNumeroIdentificador"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:hint="Fecha de ingreso (dd/mm/yyyy)"
-            android:inputType="text"
-            android:minHeight="48dp" />
+            android:hint="Número identificador">
 
-        <EditText
-            android:id="@+id/etDescripcion"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNumeroIdentificador"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilFechaIngreso"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Descripción"
-            android:inputType="textMultiLine"
-            android:minLines="3"
-            android:maxLines="5"
-            android:gravity="top"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:hint="Fecha de ingreso (dd/mm/yyyy)">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etFechaIngreso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilDescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Descripción">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:maxLines="5"
+                android:gravity="top" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -76,19 +91,16 @@
             android:layout_marginBottom="8dp"
             android:text="Partes de la Máquina"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="?android:attr/textColorPrimary" />
+            android:textStyle="bold" />
 
-        <!-- NestedScrollView para scroll interno en containerPartes (con bordes para resaltar) -->
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollPartes"
             android:layout_width="match_parent"
-            android:layout_height="312dp"
-            android:layout_marginBottom="24dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/nested_scroll_border"
-            android:fillViewport="true"
-            android:paddingBottom="48dp"
-            tools:ignore="SpeakableTextPresentCheck">
+            android:fillViewport="true">
 
             <LinearLayout
                 android:id="@+id/containerPartes"
@@ -103,43 +115,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/btnVolverFM"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
-                app:backgroundTint="#121212"
-                app:elevation="4dp"
-                app:fabSize="mini"
-                app:srcCompat="@android:drawable/ic_menu_revert"
-                app:tint="#FFFFFF"
-                tools:ignore="SpeakableTextPresentCheck" />
+            android:gravity="center_vertical">
 
             <Button
                 android:id="@+id/btnGuardarMaquinaria"
-                android:layout_width="202dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:backgroundTint="#121212"
                 android:elevation="4dp"
                 android:minHeight="56dp"
                 android:text="Guardar"
+                android:layout_marginEnd="8dp"
                 android:textColor="#FFFFFF" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabAgregarParte"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
                 app:backgroundTint="#121212"
                 app:elevation="4dp"
-                app:fabSize="normal"
+                app:fabSize="mini"
                 app:srcCompat="@drawable/ic_add"
-                app:tint="#FFFFFF"
-                tools:ignore="SpeakableTextPresentCheck" />
+                app:tint="#FFFFFF" />
 
         </LinearLayout>
 
