@@ -1,170 +1,106 @@
-¡Claro\! La estructura que tienes es un excelente punto de partida. A continuación te presento una versión mejorada de toda la documentación, enfocada en modernizar la arquitectura de la app, optimizar la estructura de Firebase para que sea más escalable y facilitar el mantenimiento a futuro.
+# SparePartsM - Gestión de Repuestos de Maquinaria 📌
 
------
+SparePartsM es una aplicación Android diseñada para talleres y operadores de maquinaria, permitiendo un registro y gestión eficientes de los repuestos utilizados en las reparaciones. El objetivo es centralizar y digitalizar esta información crítica, utilizando Firebase como backend para la persistencia de datos en tiempo real.
 
-# Nombre de la App: SparePartsM (SPM) - (Versión Mejorada)
+---
 
-## 📌 Propósito
+## 🏗️ Arquitectura: De Monolítica a MVVM
 
-SparePartsM (SPM) es una aplicación Android orientada a talleres mecánicos, que permite **registrar y gestionar repuestos utilizados en maquinarias**. El objetivo es organizar la información de repuestos y tenerla disponible de manera digital y centralizada con Firebase.
+El proyecto ha sido sometido a una refactorización completa para pasar de una estructura de código monolítica a una arquitectura moderna y escalable MVVM (Model-View-ViewModel).
 
------
+### Estado Anterior
+Inicialmente, la lógica de negocio, el manejo de datos y las interacciones con la UI estaban fuertemente acoplados dentro de las Activities y Fragments, dificultando el mantenimiento y la escalabilidad.
 
-## ⚙️ Arquitectura Recomendada: MVVM con Single-Activity
+### Transformación a MVVM
+La nueva arquitectura separa claramente las responsabilidades, haciendo la app más robusta, testeable y fácil de entender.
 
-Para una app moderna, mantenible y robusta, se recomienda una arquitectura **MVVM (Model-View-ViewModel)** y un enfoque de **Actividad Única (Single-Activity)**.
+* **View (Vista):** Compuesta por Activities y Fragments. Su única responsabilidad es dibujar la UI y notificar al ViewModel de las interacciones del usuario (clics, texto ingresado, etc.).
+* **ViewModel:** Contiene toda la lógica de la UI y el estado. Se comunica con el Repository para obtener y guardar datos. Sobrevive a cambios de configuración (como rotación de pantalla), evitando la pérdida de datos.
+* **Model (Modelo):** Representado por el Repository. Es la única fuente de verdad para los datos de la aplicación. Se encarga de decidir si obtiene los datos de una fuente remota (Firestore) o una local (en el futuro).
 
-  * **Single-Activity:** Tendrás una única `MainActivity` que actúa como contenedor principal.
-  * **Fragments:** Cada pantalla (login, lista de maquinaria, formulario) será un `Fragment`. La navegación entre ellas se gestionará de forma más eficiente y la UI será más consistente.
-  * **ViewModel:** Cada Fragment tendrá su propio `ViewModel` para manejar la lógica de negocio y los datos, sobreviviendo a cambios de configuración (como rotar la pantalla).
-  * **Repository:** Centralizará el acceso a los datos, ya sea desde Firebase (remoto) o una base de datos local (para modo offline).
+---
 
------
+## 📁 Estructura de Carpetas Actual
+
+El código fuente ahora está organizado en paquetes según su responsabilidad:
+
+```
+
+app/src/main/java/com/example/proyectoandroid/
+|
+|-- data/         \# Repositorios (AuthRepository, MaquinariaRepository)
+|-- model/        \# Clases de datos o POJOs (Maquinaria.java)
+|-- ui/           \# Componentes de la UI (Vistas y ViewModels)
+|   |-- login/      \# --- LoginActivity, LoginViewModel
+|   |-- main/       \# --- MainActivity
+|   |-- maquinaria/ \# --- MaquinariaFragment, MaquinariaFormFragment, etc.
+|   |-- profile/    \# --- ProfileFragment, ProfileViewModel
+|   |-- register/   \# --- RegistrarFormActivity, RegisterViewModel
+|   |-- reparacion/ \# --- ReparacionFragment, ReparacionViewModel
+|   |-- reportes/   \# --- ReportesFragment, ReportesViewModel
+|   ` -- ... |  `-- util/         \# Clases de utilidad (Result.java, SingleLiveEvent.java)
+
+````
+
+---
 
 ## 🚀 Instalación y Configuración
 
-Los pasos iniciales son correctos. Aquí se refinan y detallan:
+> **¡LEER CON ATENCIÓN!**
+> La conexión con Firebase es sensible a la configuración. Sigue estos pasos para garantizar que la aplicación se ejecute sin errores de conexión.
 
-1.  **Clonar el repositorio:**
-
+1.  **Clonar el Repositorio:**
     ```bash
-    git clone https://github.com/AlexIbacache/Proyecto-Android-
+    git clone [https://github.com/AlexIbacache/Proyecto-Android-](https://github.com/AlexIbacache/Proyecto-Android-)
     ```
 
-    Luego abre el proyecto en **Android Studio**.
+2.  **Crear un Nuevo Proyecto en Firebase:**
+    * Ve a la [Consola de Firebase](https://console.firebase.google.com/) y crea un proyecto nuevo.
+    * Dentro del proyecto, añade una nueva aplicación de Android. Asegúrate de que el nombre del paquete sea exactamente `com.example.proyectoandroid`.
 
-2.  **Configurar el Entorno:**
+3.  **Añadir la Huella Digital SHA-1 (Paso CRÍTICO):**
+    * Abre una terminal en Android Studio (`View` -> `Tool Windows` -> `Terminal`).
+    * Ejecuta el comando para generar el informe de firmas:
+        ```bash
+        .\gradlew signingReport
+        ```
+    * Busca la variante `debug` y copia la huella digital **SHA-1**.
+    * Vuelve a la Consola de Firebase, ve a `Configuración del proyecto` (⚙️) y en la sección "Tus apps", añade la huella digital SHA-1 que acabas de copiar.
 
-      * **Android Studio:** Versión Iguana o superior.
-      * **JDK:** Versión 21.
-      * **SDK:** Compilar con **API Level 34** (Android 14).
-      * **AGP:** Asegúrate de que la versión del *Android Gradle Plugin* sea compatible con tu versión de Gradle.
+4.  **Descargar y Añadir `google-services.json`:**
+    * Después de añadir la huella, descarga el archivo `google-services.json` que te proporciona Firebase.
+    * En Android Studio, cambia a la vista "**Project**" y coloca este archivo en la carpeta `app/`.
 
-3.  **Configurar Firebase:**
+5.  **Habilitar Servicios de Firebase:**
+    * En la Consola de Firebase, ve a la sección "Build".
+    * Habilita **Authentication** y activa el proveedor de "Correo electrónico y contraseña" y "Google".
+    * Habilita **Firestore Database**.
 
-      * Crea un proyecto en la [Firebase Console](https://console.firebase.google.com/).
-      * Descarga tu archivo `google-services.json` y colócalo en la carpeta `app/`.
-      * Habilita los siguientes servicios en la consola:
-          * **Authentication:** Para el login con Email/Password, Google, etc.
-          * **Cloud Firestore:** Como base de datos principal. Es más potente y escalable que Realtime Database para este caso de uso.
-          * **Storage:** (Opcional) Si necesitas subir fotos de las máquinas o reparaciones.
+6.  **Sincronizar y Ejecutar:**
+    * En Android Studio, haz clic en `Sync Project with Gradle Files`.
+    * Se recomienda limpiar el proyecto (`Build` -> `Clean Project`) y reconstruirlo (`Build` -> `Rebuild Project`).
+    * Ejecuta la app en un emulador o dispositivo físico. Si usas un emulador, asegúrate de que tenga los Google Play Services instalados y conexión a Internet.
 
-4.  **Sincronizar y Ejecutar:**
+---
 
-      * Haz clic en **Sync Project with Gradle Files** en Android Studio.
-      * Ejecuta la app en un emulador (API 34) o en un dispositivo físico con la depuración USB activada.
+## 🛠️ Componentes Clave Utilizados
 
------
+* **Arquitectura:** ViewModel y LiveData para implementar el patrón MVVM.
+* **UI:** Fragments para modularizar las pantallas, RecyclerView para listas eficientes y Material Components para el diseño.
+* **Datos:**
+    * **Firebase Authentication:** Para el login con Email/Contraseña y Google.
+    * **Cloud Firestore:** Como base de datos NoSQL en tiempo real.
+    * **Google Sign-In Services:** Para la integración del login con Google.
+* **Exportación:** Apache POI para la generación de archivos Excel.
 
-## 📱 Pantallas (Fragments Recomendados)
+---
 
-En lugar de múltiples `Activities`, usaremos `Fragments` para cada pantalla.
+## 🔮 Mejoras Futuras
 
-1.  **LoginFragment:** Autenticación de usuario.
-2.  **HomeFragment:** Dashboard principal con accesos directos (ej. ver maquinaria, crear reporte).
-3.  **MachineryListFragment:** Muestra la lista de maquinaria usando un `RecyclerView`.
-4.  **MachineryFormFragment:** Formulario modal (`DialogFragment`) para agregar o editar maquinaria.
-5.  **RepairListFragment:** Muestra las reparaciones de una máquina específica.
-6.  **RepairFormFragment:** Formulario para registrar una reparación y la lista de repuestos usados.
-7.  **SparePartSelectorFragment:** Un `DialogFragment` para buscar y agregar repuestos a una reparación.
-8.  **ReportFragment:** Genera y permite exportar informes en formato Excel.
+La arquitectura actual sienta las bases para futuras mejoras:
 
------
-
-## 🔄 Flujo de Navegación (con Navigation Component)
-
-Se recomienda usar **Jetpack Navigation Component** para gestionar el flujo entre fragments de manera visual y segura.
-
-  * `LoginFragment` → `HomeFragment` (si el login es exitoso).
-  * `HomeFragment` → `MachineryListFragment`.
-  * `MachineryListFragment` → `MachineryFormFragment` (para agregar/editar).
-  * `MachineryListFragment` → `RepairListFragment` (al seleccionar una máquina).
-  * `RepairListFragment` → `RepairFormFragment` (para agregar una nueva reparación).
-  * `RepairFormFragment` → `SparePartSelectorFragment` (para agregar repuestos).
-  * `HomeFragment` → `ReportFragment`.
-
------
-
-## 🏗️ Componentes Clave Recomendados
-
-Esta es una lista actualizada con librerías modernas de Android Jetpack.
-
-  * **Componentes de UI:**
-      * **Fragments:** Para modularizar la UI.
-      * **RecyclerView:** Para mostrar listas de forma eficiente.
-      * **DialogFragment:** Para ventanas modales.
-      * **Material Components:** Para botones, campos de texto y otros elementos de UI con diseño moderno.
-  * **Arquitectura y Lógica:**
-      * **ViewModel:** Para separar la lógica de la UI.
-      * **Navigation Component:** Para gestionar la navegación entre fragments.
-      * **Kotlin Coroutines:** Para manejar operaciones asíncronas (como llamadas a Firebase) de forma limpia y eficiente.
-      * **Hilt o Koin:** (Avanzado) Para inyección de dependencias, lo que facilita las pruebas y el escalado.
-  * **Datos:**
-      * **Firebase SDK:** `firebase-auth` (autenticación) y `firebase-firestore-ktx` (base de datos).
-      * **Room:** (Opcional) Para implementar una base de datos local y dar **soporte offline**.
-  * **Exportación:**
-      * **Apache POI:** Excelente opción para generar archivos Excel.
-      * **FileProvider:** Para compartir de forma segura los archivos generados.
-
------
-
-## 🔥 Estructura de Datos en Firestore (Optimizada)
-
-Esta es la mejora más importante. Se propone cambiar el array `repuestosUsados` por una **sub-colección**.
-
-### ¿Por qué una sub-colección es mejor que un array?
-
-  * **Escalabilidad:** Un documento en Firestore tiene un límite de 1MB. Si una reparación usa muchísimos repuestos, un array podría alcanzar ese límite. Una sub-colección no tiene límite en la cantidad de documentos que puede contener.
-  * **Consultas Avanzadas:** Es imposible hacer una consulta como "búscame todas las reparaciones donde se usó el repuesto X" si los repuestos están en un array. Con una sub-colección, esta consulta es sencilla y eficiente.
-  * **Actualizaciones Atómicas:** Modificar un solo repuesto en un array requiere leer todo el array, cambiarlo en el cliente y volver a escribirlo. Con una sub-colección, puedes actualizar un único documento de repuesto de forma directa.
-
-### Estructura Propuesta:
-
-```js
-// Colección Raíz: Catálogo maestro de todos los repuestos disponibles.
-catalogoRepuestos/
-  |
-  --- {repuesto_id_1}
-        |-- nombre: "Placa Fijacion"
-        |-- codigoNParte: "1008290614"
-
-// Colección Raíz: Usuarios de la aplicación.
-users/
-  |
-  --- {user_uid_1}
-        |-- email: "usuario1@email.com"
-        |
-        // Sub-colección: Maquinaria perteneciente a este usuario.
-        |--- maquinaria/
-              |
-              --- {maquina_id_1}
-                    |-- nombre: "Alpha 30"
-                    |-- numeroIdentificador: "EQ: 163"
-                    |-- fechaIngreso: Timestamp
-                    |-- descripcion: "Falla en el sistema hidráulico."
-                    |-- estado: "En Reparación" // Usar un String es más descriptivo que un booleano.
-                    |
-                    // Sub-colección: Historial de reparaciones de esta máquina.
-                    |--- reparaciones/
-                          |
-                          --- {reparacion_id_1}
-                                |-- fecha: Timestamp
-                                |-- notas: "Se encontraron pernos sueltos..."
-                                |-- tecnicoAsignado: "Juan Pérez"
-                                |
-                                // Sub-colección: Repuestos usados en ESTA reparación.
-                                |--- repuestosUsados/
-                                      |
-                                      --- {repuesto_usado_id_1}
-                                      |     |-- repuestoRef: "catalogoRepuestos/repuesto_id_1" (Reference)
-                                      |     |-- nombre: "Placa Fijacion"  // Dato denormalizado para lecturas rápidas
-                                      |     |-- codigoNParte: "1008290614" // Dato denormalizado
-                                      |     |-- cantidad: 2
-                                      |
-                                      --- {repuesto_usado_id_2}
-                                            |-- repuestoRef: "catalogoRepuestos/repuesto_id_2" (Reference)
-                                            |-- nombre: "Rodillos"
-                                            |-- codigoNParte: "1008215400"
-                                            |-- cantidad: 4
-```
-
+* **Navegación:** Implementar Jetpack Navigation Component para gestionar el flujo entre Fragments de forma más visual y segura.
+* **Asincronía:** Migrar las llamadas a Firebase para usar Kotlin Coroutines, simplificando el código asíncrono.
+* **Soporte Offline:** Integrar Room como base de datos local para permitir que la app funcione sin conexión y se sincronice con Firestore cuando vuelva a tener red.
+* **Inyección de Dependencias:** Introducir Hilt para gestionar las dependencias, facilitando las pruebas y el mantenimiento a largo plazo.
+````
