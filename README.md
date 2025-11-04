@@ -75,11 +75,63 @@ La nueva arquitectura separa claramente las responsabilidades, haciendo la app m
 
 El código fuente ahora está organizado en paquetes según su responsabilidad:
 
-app/src/main/java/com/example/proyectoandroid/ | |-- data/         # Repositorios (AuthRepository, MaquinariaRepository) |-- model/        # Clases de datos o POJOs (Maquinaria.java) |-- ui/           # Componentes de la UI (Vistas y ViewModels) |   |-- login/      # --- LoginActivity, LoginViewModel |   |-- main/       # --- MainActivity |   |-- maquinaria/ # --- MaquinariaFragment, MaquinariaFormFragment, etc. |   |-- profile/    # --- ProfileFragment, ProfileViewModel |   |-- register/   # --- RegistrarFormActivity, RegisterViewModel |   |-- reparacion/ # --- ReparacionFragment, ReparacionViewModel |   |-- reportes/   # --- ReportesFragment, ReportesViewModel |   -- ... | -- util/         # Clases de utilidad (Result.java, SingleLiveEvent.java)
+## Estructura de colecciones en Firestore
+
+- **Colección principal:** `catalogoRepuestos`
+  - Cada documento es un repuesto disponible en el catálogo.
+  - Ejemplo de documentos:
+    - `repuesto_auto_id_1`
+      - nombre: "Placa Fijacion"
+      - codigoNParte: "1008290614"
+    - `repuesto_auto_id_2`
+      - nombre: "Rodillos"
+      - codigoNParte: "1008215400"
+
+- **Colección principal:** `users`
+  - Cada documento representa un usuario, identificado por su UID de Firebase.
+  - Ejemplo de documento:
+    - `user_uid_1`
+      - email: "usuario1@email.com"
+      - **Subcolección:** `maquinaria`
+        - Cada documento es una máquina creada por ese usuario.
+        - Ejemplo de documento:
+          - `maquina_auto_id_1`
+            - nombre: "Alpha 30"
+            - numeroIdentificador: "EQ: 163"
+            - fechaIngreso: Timestamp (ejemplo: 4 de agosto, 2025)
+            - descripcion: "Falla en el sistema hidráulico."
+            - partesPrincipales: ["BRAZO BB-2027", "BLOCK BOMBEO", ...]
+            - estado: boolean (falso para inactivo, true para activo)
+            - **Subcolección:** `reparaciones`
+              - Cada documento representa una reparación realizada sobre la máquina.
+              - Ejemplo de documento:
+                - `reparacion_auto_id_1`
+                  - fecha: Timestamp (ejemplo: August 5, 2025 at 10:30 AM UTC-5)
+                  - notas: "Se encontraron pernos sueltos..."
+                  - repuestosUsados: Array de mapas
+                    - 0:
+                      - repuestoRef: "catalogoRepuestos/repuesto_auto_id_1" (referencia)
+                      - nombreRepuesto: "Placa Fijacion"
+                      - cantidad: 2
+                    - 1:
+                      - repuestoRef: "catalogoRepuestos/repuesto_auto_id_2"
+                      - nombreRepuesto: "Rodillos"
+                      - cantidad: 4
 
 
 ---
+## Patrones de diseño utilizados
 
+- **Patrón Adaptador (Adapter):**
+  Este patrón se usa directamente en la clase `PartesAdapter`. El adaptador convierte la interfaz de una clase (por ejemplo, una `List<String>`) en otra interfaz que el cliente espera (un `RecyclerView`). El adaptador sabe cómo mostrar cada elemento de la lista en las vistas de cada fila del `RecyclerView`.
+
+- **Patrón ViewHolder:**
+  Siempre que se utiliza un `RecyclerView`, el patrón ViewHolder es obligatorio. La clase interna `ParteViewHolder` mantiene referencias a las vistas (por ejemplo, `TextView` y `ImageButton`) para cada elemento de la lista. Esto evita llamadas repetitivas a `findViewById()` cada vez que se recicla una vista y mejora el rendimiento al desplazarse por la lista.
+
+- **Patrón Repositorio (Repository):**
+  Es fundamental en la arquitectura MVVM. El repositorio actúa como única fuente de verdad para los datos, separando la lógica de acceso a datos de la UI. Abstrae si los datos se obtienen de una base de datos local, una API remota (como Firestore) o una caché en memoria.
+
+---
 ## 🚀 Instalación y Configuración
 
 > **¡LEER CON ATENCIÓN!**
