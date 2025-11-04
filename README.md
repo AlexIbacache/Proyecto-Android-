@@ -71,54 +71,117 @@ La nueva arquitectura separa claramente las responsabilidades, haciendo la app m
 
 ---
 
-## 📁 Estructura de Carpetas Actual
+## 🔥 Estructura de Colecciones en Firestore
 
-El código fuente ahora está organizado en paquetes según su responsabilidad:
+La base de datos de **Cloud Firestore** está organizada en un modelo **NoSQL jerárquico**, con dos colecciones raíz principales:  
+`catalogoRepuestos` (catálogo global de repuestos) y `users` (datos y registros de cada usuario).
 
-## Estructura de colecciones en Firestore
+---
 
-- **Colección principal:** `catalogoRepuestos`
-  - Cada documento es un repuesto disponible en el catálogo.
-  - Ejemplo de documentos:
-    - `repuesto_auto_id_1`
-      - nombre: "Placa Fijacion"
-      - codigoNParte: "1008290614"
-    - `repuesto_auto_id_2`
-      - nombre: "Rodillos"
-      - codigoNParte: "1008215400"
+### 🧩 Colección Raíz: `catalogoRepuestos/`
 
-- **Colección principal:** `users`
-  - Cada documento representa un usuario, identificado por su UID de Firebase.
-  - Ejemplo de documento:
-    - `user_uid_1`
-      - email: "usuario1@email.com"
-      - **Subcolección:** `maquinaria`
-        - Cada documento es una máquina creada por ese usuario.
-        - Ejemplo de documento:
-          - `maquina_auto_id_1`
-            - nombre: "Alpha 30"
-            - numeroIdentificador: "EQ: 163"
-            - fechaIngreso: Timestamp (ejemplo: 4 de agosto, 2025)
-            - descripcion: "Falla en el sistema hidráulico."
-            - partesPrincipales: ["BRAZO BB-2027", "BLOCK BOMBEO", ...]
-            - estado: boolean (falso para inactivo, true para activo)
-            - **Subcolección:** `reparaciones`
-              - Cada documento representa una reparación realizada sobre la máquina.
-              - Ejemplo de documento:
-                - `reparacion_auto_id_1`
-                  - fecha: Timestamp (ejemplo: August 5, 2025 at 10:30 AM UTC-5)
-                  - notas: "Se encontraron pernos sueltos..."
-                  - repuestosUsados: Array de mapas
-                    - 0:
-                      - repuestoRef: "catalogoRepuestos/repuesto_auto_id_1" (referencia)
-                      - nombreRepuesto: "Placa Fijacion"
-                      - cantidad: 2
-                    - 1:
-                      - repuestoRef: "catalogoRepuestos/repuesto_auto_id_2"
-                      - nombreRepuesto: "Rodillos"
-                      - cantidad: 4
+Contiene todos los repuestos disponibles de forma **global** para todos los usuarios.  
+Cada documento representa un repuesto dentro del catálogo.
 
+**Ejemplo de estructura:**
+```markdown
+catalogoRepuestos/
+|
+--- {repuesto_auto_id_1} (Documento)
+|-- nombre: "Placa Fijacion"
+|-- codigoNParte: "1008290614"
+|
+--- {repuesto_auto_id_2} (Documento)
+|-- nombre: "Rodillos"
+|-- codigoNParte: "1008215400"
+```
 
+**Campos por documento:**
+| Campo | Tipo | Ejemplo | Descripción |
+|-------|------|----------|--------------|
+| `nombre` | `string` | `"Placa Fijacion"` | Nombre del repuesto. |
+| `codigoNParte` | `string` | `"1008290614"` | Código único o número de parte del repuesto. |
+
+---
+
+### 👤 Colección Raíz: `users/`
+
+Contiene los datos de cada usuario autenticado mediante **Firebase Authentication**.  
+Cada documento dentro de esta colección representa un usuario único, identificado por su **UID**.
+
+**Ejemplo de estructura:**
+```markdown
+users/
+|
+--- {user_uid_1} (Documento con el ID del usuario)
+|-- email: "usuario1@email.com"
+|
+|--- maquinaria/ (Subcolección)
+|
+--- {maquina_auto_id_1} (Documento)
+|-- nombre: "Alpha 30"
+|-- numeroIdentificador: "EQ: 163"
+|-- fechaIngreso: Timestamp (ej. 4 de agosto, 2025)
+|-- descripcion: "Falla en el sistema hidráulico."
+|-- partesPrincipales: ["BRAZO BB-2027", "BLOCK BOMBEO", ...]
+|-- estado: boolean (falso = en reparación / true = operativa)
+|
+|--- reparaciones/ (Subcolección)
+|
+--- {reparacion_auto_id_1} (Documento)
+|-- fecha: August 5, 2025 at 10:30 AM UTC-5 (Timestamp)
+|-- notas: "Se encontraron pernos sueltos..." (string)
+|-- repuestosUsados: (Array de Mapas)
+|
+|-- 0:
+| |-- repuestoRef: "catalogoRepuestos/repuesto_auto_id_1" (Reference)
+| |-- nombreRepuesto: "Placa Fijacion" (string)
+| |-- cantidad: 2 (number)
+|
+|-- 1:
+|-- repuestoRef: "catalogoRepuestos/repuesto_auto_id_2" (Reference)
+|-- nombreRepuesto: "Rodillos" (string)
+|-- cantidad: 4 (number)
+```
+
+---
+
+### 🏗️ Detalle de Subcolecciones y Campos
+
+#### 📂 Subcolección: `maquinaria/`
+Cada documento representa una **máquina registrada** por el usuario.
+
+| Campo | Tipo | Ejemplo | Descripción |
+|--------|------|----------|-------------|
+| `nombre` | `string` | `"Alpha 30"` | Nombre o modelo de la máquina. |
+| `numeroIdentificador` | `string` | `"EQ: 163"` | Identificador único del equipo. |
+| `fechaIngreso` | `timestamp` | `2025-08-04` | Fecha de ingreso al taller. |
+| `descripcion` | `string` | `"Falla en el sistema hidráulico."` | Detalle del problema reportado. |
+| `partesPrincipales` | `array<string>` | `["BRAZO BB-2027", "BLOCK BOMBEO"]` | Partes clave de la máquina. |
+| `estado` | `boolean` | `false` | Estado operativo (`false` = en reparación, `true` = activa). |
+
+---
+
+#### ⚙️ Subcolección: `reparaciones/`
+Cada documento representa una **reparación o intervención** realizada sobre una máquina.
+
+| Campo | Tipo | Ejemplo | Descripción |
+|--------|------|----------|-------------|
+| `fecha` | `timestamp` | `"2025-08-05T10:30:00"` | Fecha de la reparación. |
+| `notas` | `string` | `"Se encontraron pernos sueltos..."` | Observaciones del técnico. |
+| `repuestosUsados` | `array<Map>` | Ver tabla siguiente | Lista de repuestos utilizados en esta reparación. |
+
+---
+
+#### 🧱 Detalle del Campo `repuestosUsados` (Array de Mapas)
+
+Cada elemento del array representa un repuesto específico utilizado durante la reparación.
+
+| Campo | Tipo | Ejemplo | Descripción |
+|--------|------|----------|-------------|
+| `repuestoRef` | `Reference` | `catalogoRepuestos/repuesto_auto_id_1` | Referencia directa al repuesto en el catálogo global. |
+| `nombreRepuesto` | `string` | `"Placa Fijacion"` | Nombre desnormalizado para visualización rápida. |
+| `cantidad` | `number` | `2` | Número de unidades utilizadas. |
 ---
 ## Patrones de diseño utilizados
 
@@ -139,7 +202,7 @@ El código fuente ahora está organizado en paquetes según su responsabilidad:
 
 1.  **Clonar el Repositorio:**
     ```bash
-    git clone [https://github.com/AlexIbacache/Proyecto-Android-](https://github.com/AlexIbacache/Proyecto-Android-)
+    git clone https://github.com/AlexIbacache/Proyecto-Android-
     ```
 
 2.  **Crear un Nuevo Proyecto en Firebase:**
@@ -150,7 +213,7 @@ El código fuente ahora está organizado en paquetes según su responsabilidad:
     * Abre una terminal en Android Studio (`View` -> `Tool Windows` -> `Terminal`).
     * Ejecuta el comando para generar el informe de firmas:
         ```bash
-        .\gradlew signingReport
+        ./gradlew signingReport
         ```
     * Busca la variante `debug` y copia la huella digital **SHA-1**.
     * Vuelve a la Consola de Firebase, ve a `Configuración del proyecto` (⚙️) y en la sección "Tus apps", añade la huella digital SHA-1 que acabas de copiar.
@@ -191,6 +254,3 @@ La arquitectura actual sienta las bases para futuras mejoras:
 * **Asincronía:** Migrar las llamadas a Firebase para usar Kotlin Coroutines, simplificando el código asíncrono.
 * **Soporte Offline:** Integrar Room como base de datos local para permitir que la app funcione sin conexión y se sincronice con Firestore cuando vuelva a tener red.
 * **Inyección de Dependencias:** Introducir Hilt para gestionar las dependencias, facilitando las pruebas y el mantenimiento a largo plazo.
-```
-
----
