@@ -4,15 +4,66 @@ SparePartsM es una aplicación Android diseñada para talleres y operadores de m
 
 ---
 
+## 💾 Estructura de la Base de Datos (Cloud Firestore) 
+La base de datos utiliza un modelo NoSQL jerárquico centrado en dos colecciones raíz principales: `catalogoRepuestos` para información global y `users` para datos específicos de cada usuario, incluyendo su maquinaria y reparaciones.
+
+### Colecciones Raíz
+
+* **`catalogoRepuestos/`** ➡️ **Catálogo Global de Repuestos**
+    * **Documento ID:** `{repuesto_auto_id_X}` (ID autogenerado).
+    * **Campos:**
+        * `nombre`: `string` (Ej: "Placa Fijacion").
+        * `codigoNParte`: `string` (Ej: "1008290614").
+
+* **`users/`** ➡️ **Usuarios de la Aplicación**
+    * **Documento ID:** `{user_uid_X}` (ID de usuario de Firebase Authentication).
+    * **Campos:**
+        * `email`: `string` (Ej: "usuario1@email.com").
+    * **Subcolección:** `maquinaria/`
+
+### Estructura de Maquinaria y Reparaciones
+
+La gestión operativa se anida dentro de la subcolección `maquinaria/` de cada usuario:
+
+* **`users/{user_uid_X}/maquinaria/`** ➡️ **Maquinaria Registrada por el Usuario**
+    * **Documento ID:** `{maquina_auto_id_X}` (ID autogenerado).
+    * **Campos:**
+        * `nombre`: `string` (Ej: "Alpha 30").
+        * `numeroIdentificador`: `string` (Ej: "EQ: 163").
+        * `fechaIngreso`: `Timestamp`.
+        * `descripcion`: `string` (Ej: "Falla en el sistema hidráulico.").
+        * `partesPrincipales`: `Array` de `string` (Ej: ["BRAZO BB-2027", "BLOCK BOMBEO"]).
+        * `estado`: `boolean` (`falso` = en reparación/inactiva; `true` = operativa).
+    * **Subcolección:** `reparaciones/`
+
+* **`users/{user_uid_X}/maquinaria/{maquina_auto_id_X}/reparaciones/`** ➡️ **Historial de Reparaciones**
+    * **Documento ID:** `{reparacion_auto_id_X}` (ID autogenerado).
+    * **Campos:**
+        * `fecha`: `Timestamp`.
+        * `notas`: `string` (Ej: "Se encontraron pernos sueltos...").
+        * `repuestosUsados`: `Array` de **Mapas (Objetos)**.
+
+#### Detalle de `repuestosUsados` (Array de Mapas)
+
+Cada elemento dentro del array `repuestosUsados` es un objeto que detalla el repuesto utilizado, manteniendo una referencia al catálogo principal:
+
+| Campo | Tipo | Ejemplo | Descripción |
+| :--- | :--- | :--- | :--- |
+| `repuestoRef` | `Reference` | `catalogoRepuestos/repuesto_auto_id_1` | Referencia directa al documento en la colección raíz `catalogoRepuestos`. |
+| `nombreRepuesto` | `string` | "Placa Fijacion" | Nombre del repuesto (copia desnormalizada para visualización rápida). |
+| `cantidad` | `number` | 2 | Cantidad de unidades utilizadas. |
+
+---
+
 ## 🏗️ Arquitectura: De Monolítica a MVVM
 
-El proyecto ha sido sometido a una refactorización completa para pasar de una estructura de código monolítica a una arquitectura moderna y escalable MVVM (Model-View-ViewModel).
+El proyecto ha sido sometido a una refactorización completa para pasar de una estructura de código monolítica a una arquitectura moderna y escalable **MVVM (Model-View-ViewModel)**.
 
 ### Estado Anterior
 Inicialmente, la lógica de negocio, el manejo de datos y las interacciones con la UI estaban fuertemente acoplados dentro de las Activities y Fragments, dificultando el mantenimiento y la escalabilidad.
 
 ### Transformación a MVVM
-La nueva arquitectura separa claramente las responsabilidades, haciendo la app más robusta, testeable y fácil de entender.
+La nueva arquitectura separa claramente las responsabilidades, haciendo la app más **robusta**, **testeable** y fácil de entender.
 
 * **View (Vista):** Compuesta por Activities y Fragments. Su única responsabilidad es dibujar la UI y notificar al ViewModel de las interacciones del usuario (clics, texto ingresado, etc.).
 * **ViewModel:** Contiene toda la lógica de la UI y el estado. Se comunica con el Repository para obtener y guardar datos. Sobrevive a cambios de configuración (como rotación de pantalla), evitando la pérdida de datos.
@@ -24,23 +75,8 @@ La nueva arquitectura separa claramente las responsabilidades, haciendo la app m
 
 El código fuente ahora está organizado en paquetes según su responsabilidad:
 
-```
+app/src/main/java/com/example/proyectoandroid/ | |-- data/         # Repositorios (AuthRepository, MaquinariaRepository) |-- model/        # Clases de datos o POJOs (Maquinaria.java) |-- ui/           # Componentes de la UI (Vistas y ViewModels) |   |-- login/      # --- LoginActivity, LoginViewModel |   |-- main/       # --- MainActivity |   |-- maquinaria/ # --- MaquinariaFragment, MaquinariaFormFragment, etc. |   |-- profile/    # --- ProfileFragment, ProfileViewModel |   |-- register/   # --- RegistrarFormActivity, RegisterViewModel |   |-- reparacion/ # --- ReparacionFragment, ReparacionViewModel |   |-- reportes/   # --- ReportesFragment, ReportesViewModel |   -- ... | -- util/         # Clases de utilidad (Result.java, SingleLiveEvent.java)
 
-app/src/main/java/com/example/proyectoandroid/
-|
-|-- data/         \# Repositorios (AuthRepository, MaquinariaRepository)
-|-- model/        \# Clases de datos o POJOs (Maquinaria.java)
-|-- ui/           \# Componentes de la UI (Vistas y ViewModels)
-|   |-- login/      \# --- LoginActivity, LoginViewModel
-|   |-- main/       \# --- MainActivity
-|   |-- maquinaria/ \# --- MaquinariaFragment, MaquinariaFormFragment, etc.
-|   |-- profile/    \# --- ProfileFragment, ProfileViewModel
-|   |-- register/   \# --- RegistrarFormActivity, RegisterViewModel
-|   |-- reparacion/ \# --- ReparacionFragment, ReparacionViewModel
-|   |-- reportes/   \# --- ReportesFragment, ReportesViewModel
-|   ` -- ... |  `-- util/         \# Clases de utilidad (Result.java, SingleLiveEvent.java)
-
-````
 
 ---
 
@@ -103,4 +139,6 @@ La arquitectura actual sienta las bases para futuras mejoras:
 * **Asincronía:** Migrar las llamadas a Firebase para usar Kotlin Coroutines, simplificando el código asíncrono.
 * **Soporte Offline:** Integrar Room como base de datos local para permitir que la app funcione sin conexión y se sincronice con Firestore cuando vuelva a tener red.
 * **Inyección de Dependencias:** Introducir Hilt para gestionar las dependencias, facilitando las pruebas y el mantenimiento a largo plazo.
-````
+```
+
+---
