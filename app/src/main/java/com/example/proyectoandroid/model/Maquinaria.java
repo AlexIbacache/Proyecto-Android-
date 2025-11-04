@@ -1,4 +1,4 @@
-package com.example.proyectoandroid;
+package com.example.proyectoandroid.model;
 
 import java.util.List;
 

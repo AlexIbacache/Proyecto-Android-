@@ -1,13 +1,18 @@
-package com.example.proyectoandroid;
+package com.example.proyectoandroid.ui.main;
 
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.proyectoandroid.R;
+import com.example.proyectoandroid.ui.maquinaria.MaquinariaFragment;
+import com.example.proyectoandroid.ui.profile.ProfileFragment;
+import com.example.proyectoandroid.ui.reparacion.ReparacionFragment;
+import com.example.proyectoandroid.ui.reportes.ReportesFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class MenuActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,13 +28,10 @@ public class MenuActivity extends AppCompatActivity {
             if (itemId == R.id.nav_perfil) {
                 selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.nav_maquinaria) {
-                // Reemplaza esto con la lógica para mostrar tu lista de maquinaria
                 selectedFragment = new MaquinariaFragment();
             } else if (itemId == R.id.nav_reparacion) {
-                // Reemplaza esto con la lógica para la sección de reparación
                 selectedFragment = new ReparacionFragment();
             } else if (itemId == R.id.nav_reportes) {
-                // Reemplaza esto con la lógica para ver los reportes
                 selectedFragment = new ReportesFragment();
             }
 

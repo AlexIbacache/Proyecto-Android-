@@ -1,4 +1,4 @@
-package com.example.proyectoandroid;
+package com.example.proyectoandroid.ui.profile;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -21,11 +21,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
+import com.example.proyectoandroid.R;
+import com.example.proyectoandroid.ui.login.LoginActivity;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,13 +37,14 @@ public class ProfileFragment extends Fragment {
 
     private TextView tvUbicacion;
     private TextView tvEmail;
+    private ProfileViewModel profileViewModel;
     private FusedLocationProviderClient fusedLocationClient;
-    private FirebaseAuth mAuth;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    obtenerUbicacion();
+                    // Correcto: El fragmento se encarga de llamar a su propio método de UI/HW
+                    getDeviceLocation();
                 } else {
                     Toast.makeText(getContext(), "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
                 }
@@ -52,74 +55,56 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        mAuth = FirebaseAuth.getInstance();
+        profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
-        // Inicializar vistas con los nuevos IDs dentro de las tarjetas
         tvEmail = view.findViewById(R.id.tvEmail);
         tvUbicacion = view.findViewById(R.id.tvUbicacion);
         Button btnCerrarS = view.findViewById(R.id.btnCerrarS);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
-        // Cargar datos del usuario
-        cargarDatosUsuario();
+        profileViewModel.getUserEmail().observe(getViewLifecycleOwner(), email -> {
+            tvEmail.setText(email);
+        });
 
-        // Obtener ubicación
-        verificarPermisoYObtenerUbicacion();
+        profileViewModel.getLocation().observe(getViewLifecycleOwner(), locationName -> {
+            tvUbicacion.setText(locationName);
+        });
 
-        // Configurar botón de cerrar sesión
-        btnCerrarS.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
+        profileViewModel.getLogoutEvent().observe(getViewLifecycleOwner(), aVoid -> {
             startActivity(new Intent(getActivity(), LoginActivity.class));
             requireActivity().finish();
         });
 
-        return view;
-    }
+        btnCerrarS.setOnClickListener(v -> {
+            profileViewModel.logout();
+        });
 
-    private void cargarDatosUsuario() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            tvEmail.setText(user.getEmail());
-        }
+        // Iniciar la carga de datos
+        profileViewModel.loadUserData();
+        verificarPermisoYObtenerUbicacion();
+
+        return view;
     }
 
     private void verificarPermisoYObtenerUbicacion() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            obtenerUbicacion();
+            // Correcto: El fragmento se encarga de llamar a su propio método de UI/HW
+            getDeviceLocation();
         } else {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
 
     @SuppressLint("MissingPermission")
-    private void obtenerUbicacion() {
+    public void getDeviceLocation() {
         fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), location -> {
             if (location != null) {
-                obtenerNombreUbicacion(location);
+                profileViewModel.onLocationReceived(location);
             } else {
-                tvUbicacion.setText("Ubicación no disponible");
+                profileViewModel.onLocationFailed("Ubicación no disponible");
             }
         });
-    }
-
-    private void obtenerNombreUbicacion(Location location) {
-        Geocoder geocoder = new Geocoder(requireContext(), new Locale("es", "CL"));
-        try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address a = addresses.get(0);
-                String nombre = a.getSubLocality();
-                if (nombre == null) nombre = a.getLocality();
-                if (nombre == null) nombre = a.getSubAdminArea();
-                if (nombre == null) nombre = a.getAdminArea();
-                tvUbicacion.setText(nombre != null ? nombre : "Nombre de ubicación no encontrado");
-            } else {
-                tvUbicacion.setText("Dirección no encontrada");
-            }
-        } catch (IOException e) {
-            tvUbicacion.setText("Error de geocodificación");
-        }
     }
 }

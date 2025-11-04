@@ -10,9 +10,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.proyectoandroid" />
-                  <option name="mobileSdkAppId" value="1:632578833437:android:239f5de183b325fa36daf4" />
-                  <option name="projectId" value="proyecto---sparepartsm" />
-                  <option name="projectNumber" value="632578833437" />
+                  <option name="mobileSdkAppId" value="1:80626907249:android:04a573b82ba73b81bf43d0" />
+                  <option name="projectId" value="maquinaria-cf7cc" />
+                  <option name="projectNumber" value="80626907249" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

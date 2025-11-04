@@ -1,4 +1,4 @@
-package com.example.proyectoandroid;
+package com.example.proyectoandroid.ui.maquinaria;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.proyectoandroid.R;
 
 import java.util.List;
 
@@ -39,12 +41,14 @@ public class PartesAdapter extends RecyclerView.Adapter<PartesAdapter.ParteViewH
         holder.btnModificarParte.setOnClickListener(v -> {
             Toast.makeText(context, "Modificar: " + parte, Toast.LENGTH_SHORT).show();
             // Aquí irá la lógica para abrir un diálogo o fragmento de edición
+            // Se podría notificar al ViewModel para que maneje esta acción.
         });
 
         // Listener para el botón Eliminar
         holder.btnEliminarParte.setOnClickListener(v -> {
             Toast.makeText(context, "Eliminar: " + parte, Toast.LENGTH_SHORT).show();
-            // Aquí irá la lógica para eliminar la parte de Firestore y actualizar la lista
+            // Aquí irá la lógica para eliminar la parte de Firestore y actualizar la lista.
+            // Se podría notificar al ViewModel para que maneje esta acción.
         });
     }
 
