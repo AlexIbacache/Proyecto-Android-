@@ -30,7 +30,7 @@ public class ReportesViewModel extends ViewModel {
             if (maquina == null) {
                 return new MutableLiveData<>(); // Return empty LiveData
             }
-            return maquinariaRepository.getReparacionesDeMaquina(maquina.getId());
+            return maquinariaRepository.getReparacionesDeMaquina(maquina.getDocumentId());
         });
     }
 

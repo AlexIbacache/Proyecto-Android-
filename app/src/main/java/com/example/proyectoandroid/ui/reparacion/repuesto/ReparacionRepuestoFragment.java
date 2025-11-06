@@ -14,13 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectoandroid.R;
-import com.example.proyectoandroid.model.Repuesto;
 import com.example.proyectoandroid.ui.reparacion.ReparacionRepuestoAdapter;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ReparacionRepuestoFragment extends Fragment {
 
@@ -35,13 +33,14 @@ public class ReparacionRepuestoFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(ReparacionRepuestoViewModel.class);
 
-        // 1. Inicializar las vistas primero
         rvRepuestosCatalogo = view.findViewById(R.id.rvRepuestosCatalogo);
         MaterialButton btnConfirmar = view.findViewById(R.id.btnConfirmarRepuestos);
 
-        // 2. Luego, configurar el RecyclerView
         setupRecyclerView();
-        loadMockData();
+
+        viewModel.getCatalogoRepuestos().observe(getViewLifecycleOwner(), repuestos -> {
+            adapter.updateData(repuestos);
+        });
 
         btnConfirmar.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Repuestos confirmados (Función próximamente)", Toast.LENGTH_SHORT).show();
@@ -53,16 +52,8 @@ public class ReparacionRepuestoFragment extends Fragment {
 
     private void setupRecyclerView() {
         rvRepuestosCatalogo.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ReparacionRepuestoAdapter(new ArrayList<>(), new HashMap<>());
+        // El viewModel se encargará de mantener los repuestos seleccionados
+        adapter = new ReparacionRepuestoAdapter(new ArrayList<>(), viewModel.getRepuestosSeleccionados().getValue());
         rvRepuestosCatalogo.setAdapter(adapter);
-    }
-
-    private void loadMockData() {
-        List<Repuesto> repuestosDeEjemplo = new ArrayList<>();
-        repuestosDeEjemplo.add(new Repuesto("repuesto_1", "Filtro de Aire", "FA-123"));
-        repuestosDeEjemplo.add(new Repuesto("repuesto_2", "Bujía de Iridio", "BJ-456"));
-        repuestosDeEjemplo.add(new Repuesto("repuesto_3", "Pastillas de Freno", "PF-789"));
-
-        adapter.updateData(repuestosDeEjemplo);
     }
 }

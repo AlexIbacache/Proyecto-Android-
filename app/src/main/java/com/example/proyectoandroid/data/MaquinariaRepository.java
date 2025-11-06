@@ -105,11 +105,25 @@ public class MaquinariaRepository {
         }
     }
 
+    public void guardarReparacion(String maquinariaId, Reparacion reparacion, FirestoreCallback callback) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null && maquinariaId != null) {
+            db.collection("users").document(currentUser.getUid())
+                    .collection("maquinaria").document(maquinariaId)
+                    .collection("reparaciones")
+                    .add(reparacion)
+                    .addOnSuccessListener(documentReference -> callback.onComplete(true))
+                    .addOnFailureListener(e -> callback.onComplete(false));
+        } else {
+            callback.onComplete(false);
+        }
+    }
+
     public void actualizarMaquinaria(Maquinaria maquinaria, FirestoreCallback callback) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null && maquinaria.getId() != null) {
+        if (currentUser != null && maquinaria.getDocumentId() != null) {
             db.collection("users").document(currentUser.getUid())
-              .collection("maquinaria").document(maquinaria.getId())
+              .collection("maquinaria").document(maquinaria.getDocumentId())
               .set(maquinaria)
               .addOnSuccessListener(aVoid -> callback.onComplete(true))
               .addOnFailureListener(e -> callback.onComplete(false));

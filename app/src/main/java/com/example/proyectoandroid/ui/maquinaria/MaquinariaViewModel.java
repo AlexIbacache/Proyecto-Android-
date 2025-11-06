@@ -42,7 +42,7 @@ public class MaquinariaViewModel extends ViewModel {
 
     public void eliminarMaquinaSeleccionada(Maquinaria maquinaAEliminar) {
         if (maquinaAEliminar != null) {
-            repository.eliminarMaquinaria(maquinaAEliminar.getId());
+            repository.eliminarMaquinaria(maquinaAEliminar.getDocumentId());
             onMaquinaSeleccionada(null); // Limpia la selección
         }
     }

@@ -1,6 +1,8 @@
 package com.example.proyectoandroid.ui.reparacion;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,6 +14,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -20,31 +24,57 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectoandroid.R;
+import com.example.proyectoandroid.model.Maquinaria;
+import com.example.proyectoandroid.model.Repuesto;
+import com.example.proyectoandroid.ui.repuesto.RepuestoActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class ReparacionFragment extends Fragment {
+public class ReparacionFragment extends Fragment implements ReparacionPartesAdapter.OnItemClickListener {
 
     private ReparacionViewModel viewModel;
     private Spinner spinnerMaquinaria;
     private TextInputEditText etFecha, etNotas;
     private RecyclerView recyclerViewPartes;
     private ReparacionPartesAdapter adapter;
+    private List<Maquinaria> maquinariaList = new ArrayList<>();
+    private ActivityResultLauncher<Intent> repuestoActivityResultLauncher;
+    private String parteSeleccionada;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        repuestoActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        List<Repuesto> repuestos = (List<Repuesto>) result.getData().getSerializableExtra(RepuestoActivity.EXTRA_REPUESTOS_LISTA);
+                        if (repuestos != null && parteSeleccionada != null) {
+                            viewModel.actualizarRepuestosParaParte(parteSeleccionada, repuestos);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_reparacion, container, false);
+        return inflater.inflate(R.layout.fragment_reparacion, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(ReparacionViewModel.class);
 
-        // Inicializar vistas
         spinnerMaquinaria = view.findViewById(R.id.spinnerMaquinaria);
         etFecha = view.findViewById(R.id.etFecha);
         etNotas = view.findViewById(R.id.etNotas);
@@ -52,27 +82,103 @@ public class ReparacionFragment extends Fragment {
         MaterialButton btnGuardar = view.findViewById(R.id.btnGuardarReparacion);
 
         setupRecyclerView();
-        setupSpinnerWithMockData(); // Usamos datos de ejemplo
+        setupSpinner();
+        setupObservers();
 
-        // Configurar Listeners
-        etFecha.setOnClickListener(v -> showDatePickerDialog());
+        etFecha.setOnClickListener(v -> viewModel.onFechaClicked());
         btnGuardar.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Guardar reparación... (Función próximamente)", Toast.LENGTH_SHORT).show();
+            String notas = etNotas.getText() != null ? etNotas.getText().toString() : "";
+            viewModel.guardarReparacion(notas);
         });
-
-        return view;
     }
 
     private void setupRecyclerView() {
         recyclerViewPartes.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ReparacionPartesAdapter(new ArrayList<>());
+        adapter = new ReparacionPartesAdapter(new ArrayList<>(), viewModel);
+        adapter.setOnItemClickListener(this);
         recyclerViewPartes.setAdapter(adapter);
     }
 
-    private void setupSpinnerWithMockData() {
-        List<String> nombresMaquinas = new ArrayList<>(Arrays.asList("Seleccione una máquina...", "Excavadora 320D", "Cargador Frontal 980H"));
-        
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, nombresMaquinas) {
+    private void setupSpinner() {
+        spinnerMaquinaria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (parent.getChildAt(0) instanceof TextView) {
+                    ((TextView) parent.getChildAt(0)).setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
+                }
+
+                if (position > 0) {
+                    Maquinaria selected = maquinariaList.get(position - 1);
+                    viewModel.onMaquinariaSelected(selected);
+                } else {
+                    viewModel.onMaquinariaSelected(null);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                viewModel.onMaquinariaSelected(null);
+            }
+        });
+    }
+
+    private void setupObservers() {
+        viewModel.getMaquinarias().observe(getViewLifecycleOwner(), maquinarias -> {
+            if (maquinarias != null && !maquinarias.isEmpty()) {
+                this.maquinariaList.clear();
+                this.maquinariaList.addAll(maquinarias);
+
+                List<String> nombresMaquinas = new ArrayList<>();
+                nombresMaquinas.add("Seleccione una máquina...");
+                for (Maquinaria m : maquinarias) {
+                    nombresMaquinas.add(m.getNombre());
+                }
+
+                ArrayAdapter<String> spinnerAdapter = createSpinnerAdapter(nombresMaquinas);
+                spinnerMaquinaria.setAdapter(spinnerAdapter);
+                spinnerMaquinaria.setEnabled(true);
+            } else {
+                this.maquinariaList.clear();
+                List<String> emptyList = new ArrayList<>();
+                emptyList.add("No hay máquinas disponibles");
+                ArrayAdapter<String> emptyAdapter = createSpinnerAdapter(emptyList);
+                spinnerMaquinaria.setAdapter(emptyAdapter);
+                spinnerMaquinaria.setEnabled(false);
+            }
+        });
+
+        viewModel.getPartesMaquinaria().observe(getViewLifecycleOwner(), partes -> {
+            adapter.updateData(partes != null ? partes : new ArrayList<>());
+        });
+
+        viewModel.getShowDatePickerEvent().observe(getViewLifecycleOwner(), e -> showDatePickerDialog());
+
+        viewModel.getSelectedDate().observe(getViewLifecycleOwner(), date -> {
+            etFecha.setText(date);
+        });
+
+        viewModel.getReparacionGuardadaState().observe(getViewLifecycleOwner(), success -> {
+            if (success == null) return;
+            if (success) {
+                Toast.makeText(getContext(), "Reparación guardada con éxito", Toast.LENGTH_SHORT).show();
+                limpiarFormularioCompleto();
+            } else {
+                Toast.makeText(getContext(), "Error al guardar la reparación. Verifique los datos.", Toast.LENGTH_LONG).show();
+            }
+            viewModel.resetSaveState();
+        });
+    }
+
+    private void limpiarFormularioCompleto() {
+        viewModel.limpiarFormulario();
+        spinnerMaquinaria.setSelection(0);
+        etFecha.setText("");
+        etNotas.setText("");
+        adapter.updateData(new ArrayList<>());
+    }
+
+    private ArrayAdapter<String> createSpinnerAdapter(List<String> items) {
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, items) {
             @Override
             public boolean isEnabled(int position) {
                 return position != 0;
@@ -82,56 +188,40 @@ public class ReparacionFragment extends Fragment {
             public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 View view = super.getDropDownView(position, convertView, parent);
                 TextView tv = (TextView) view;
-                if (position == 0) {
-                    tv.setTextColor(Color.GRAY);
-                } else {
-                    tv.setTextColor(Color.BLACK);
-                }
+                tv.setTextColor(position == 0 ? Color.GRAY : Color.BLACK);
                 return view;
             }
         };
-
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMaquinaria.setAdapter(spinnerAdapter);
-
-        spinnerMaquinaria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 if (parent.getChildAt(0) instanceof TextView) {
-                    if (position == 0) {
-                        ((TextView) parent.getChildAt(0)).setTextColor(Color.GRAY);
-                    } else {
-                        ((TextView) parent.getChildAt(0)).setTextColor(Color.BLACK);
-                    }
-                }
-
-                if (position > 0) {
-                    List<String> partes = (position == 1)
-                        ? Arrays.asList("Cuchara Principal", "Motor Diesel", "Sistema Hidráulico")
-                        : Arrays.asList("Neumáticos", "Cabina del Operador", "Motor");
-                    adapter.updateData(partes);
-                } else {
-                    adapter.updateData(new ArrayList<>());
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                adapter.updateData(new ArrayList<>());
-            }
-        });
+        return spinnerAdapter;
     }
 
     private void showDatePickerDialog() {
         Calendar calendar = Calendar.getInstance();
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
+        new DatePickerDialog(
                 requireContext(),
                 (v, year, month, dayOfMonth) -> {
                     String selectedDate = String.format(Locale.getDefault(), "%02d/%02d/%d", dayOfMonth, month + 1, year);
-                    etFecha.setText(selectedDate);
+                    viewModel.onDateSelected(selectedDate);
                 },
                 calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
-        );
-        datePickerDialog.show();
+        ).show();
+    }
+
+    @Override
+    public void onAnadirRepuestoClick(String parte) {
+        this.parteSeleccionada = parte;
+        Intent intent = new Intent(getActivity(), RepuestoActivity.class);
+        intent.putExtra(RepuestoActivity.EXTRA_PARTE_NOMBRE, parte);
+
+        // --- NUEVA LÓGICA ---
+        // Obtenemos los repuestos que ya existen para esta parte
+        List<Repuesto> repuestosExistentes = viewModel.getRepuestosParaParte(parte);
+        if (repuestosExistentes != null && !repuestosExistentes.isEmpty()) {
+            // Si existen, los añadimos al intent para que la siguiente pantalla los reciba
+            intent.putExtra(RepuestoActivity.EXTRA_REPUESTOS_LISTA, (Serializable) repuestosExistentes);
+        }
+
+        repuestoActivityResultLauncher.launch(intent);
     }
 }

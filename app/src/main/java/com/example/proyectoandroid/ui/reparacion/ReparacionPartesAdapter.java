@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,10 +15,23 @@ import java.util.List;
 
 public class ReparacionPartesAdapter extends RecyclerView.Adapter<ReparacionPartesAdapter.ReparacionParteViewHolder> {
 
-    private List<String> partes;
+    public static final String EXTRA_PARTE_NOMBRE_PARA_ADAPTADOR = "com.example.proyectoandroid.EXTRA_PARTE_NOMBRE_PARA_ADAPTADOR";
 
-    public ReparacionPartesAdapter(List<String> partes) {
+    private List<String> partes;
+    private ReparacionViewModel viewModel;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onAnadirRepuestoClick(String parte);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    public ReparacionPartesAdapter(List<String> partes, ReparacionViewModel viewModel) {
         this.partes = partes;
+        this.viewModel = viewModel;
     }
 
     @NonNull
@@ -32,12 +44,11 @@ public class ReparacionPartesAdapter extends RecyclerView.Adapter<ReparacionPart
     @Override
     public void onBindViewHolder(@NonNull ReparacionParteViewHolder holder, int position) {
         String parte = partes.get(position);
-        holder.nombreParte.setText(parte);
+        holder.bind(parte, listener);
 
-        holder.btnAnadirRepuesto.setOnClickListener(v -> {
-            // Lógica para abrir el diálogo de añadir repuesto
-            Toast.makeText(v.getContext(), "Añadir repuesto para: " + parte, Toast.LENGTH_SHORT).show();
-        });
+        // Aquí puedes actualizar la UI para mostrar cuántos repuestos hay, si quieres.
+        // int cantidadRepuestos = viewModel.getCantidadRepuestosParaParte(parte);
+        // holder.tvCantidadRepuestos.setText(String.valueOf(cantidadRepuestos));
     }
 
     @Override
@@ -46,7 +57,8 @@ public class ReparacionPartesAdapter extends RecyclerView.Adapter<ReparacionPart
     }
 
     public void updateData(List<String> nuevasPartes) {
-        this.partes = nuevasPartes;
+        this.partes.clear();
+        this.partes.addAll(nuevasPartes);
         notifyDataSetChanged();
     }
 
@@ -58,6 +70,18 @@ public class ReparacionPartesAdapter extends RecyclerView.Adapter<ReparacionPart
             super(itemView);
             nombreParte = itemView.findViewById(R.id.tvNombreParteReparacion);
             btnAnadirRepuesto = itemView.findViewById(R.id.btnAnadirRepuesto);
+        }
+
+        public void bind(final String parte, final OnItemClickListener listener) {
+            nombreParte.setText(parte);
+            btnAnadirRepuesto.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onAnadirRepuestoClick(parte);
+                    }
+                }
+            });
         }
     }
 }

@@ -1,29 +1,31 @@
 package com.example.proyectoandroid.model;
 
 import com.google.firebase.firestore.DocumentId;
+import java.io.Serializable;
 
-public class Repuesto {
+public class Repuesto implements Serializable {
+
     @DocumentId
-    private String id;
+    private String documentId;
     private String nombre;
-    private String codigoNParte;
+    private String codigo;
+    private int cantidad;
 
-    public Repuesto() {
-        // Constructor vacío requerido por Firestore
-    }
+    // Constructor vacío requerido para Firestore
+    public Repuesto() {}
 
-    public Repuesto(String id, String nombre, String codigoNParte) {
-        this.id = id;
+    public Repuesto(String nombre, String codigo, int cantidad) {
         this.nombre = nombre;
-        this.codigoNParte = codigoNParte;
+        this.codigo = codigo;
+        this.cantidad = cantidad;
     }
 
-    public String getId() {
-        return id;
+    public String getDocumentId() {
+        return documentId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getNombre() {
@@ -34,11 +36,19 @@ public class Repuesto {
         this.nombre = nombre;
     }
 
-    public String getCodigoNParte() {
-        return codigoNParte;
+    public String getCodigo() {
+        return codigo;
     }
 
-    public void setCodigoNParte(String codigoNParte) {
-        this.codigoNParte = codigoNParte;
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
     }
 }

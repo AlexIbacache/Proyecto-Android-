@@ -133,7 +133,7 @@ public class MaquinariaFragment extends Fragment implements PartesAdapter.OnPart
             int position = spinnerMaquinarias.getSelectedItemPosition();
             if (position > 0 && position <= maquinariaList.size()) {
                 Maquinaria maquinaAEditar = maquinariaList.get(position - 1);
-                navigateToFormFragment(maquinaAEditar.getId());
+                navigateToFormFragment(maquinaAEditar.getDocumentId());
             } else {
                 Toast.makeText(getContext(), "Selecciona una maquinaria para editar", Toast.LENGTH_SHORT).show();
             }

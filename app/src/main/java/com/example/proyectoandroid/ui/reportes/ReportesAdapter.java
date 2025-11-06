@@ -50,6 +50,13 @@ public class ReportesAdapter extends RecyclerView.Adapter<ReportesAdapter.Report
         return maquinariaList.size();
     }
 
+    // Método para actualizar los datos del adaptador
+    public void updateData(List<Maquinaria> nuevaLista) {
+        this.maquinariaList.clear();
+        this.maquinariaList.addAll(nuevaLista);
+        notifyDataSetChanged();
+    }
+
     static class ReporteViewHolder extends RecyclerView.ViewHolder {
         private TextView tvNumeroIdentificador;
         private TextView tvNombreMaquina;

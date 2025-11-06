@@ -36,12 +36,12 @@ public class ReparacionRepuestoAdapter extends RecyclerView.Adapter<ReparacionRe
         Repuesto repuesto = catalogoRepuestos.get(position);
         holder.tvNombreRepuesto.setText(repuesto.getNombre());
 
-        boolean isSelected = repuestosSeleccionados.containsKey(repuesto.getId());
+        boolean isSelected = repuestosSeleccionados.containsKey(repuesto.getDocumentId());
         holder.cbRepuesto.setChecked(isSelected);
         holder.etCantidad.setEnabled(isSelected);
 
         if (isSelected) {
-            holder.etCantidad.setText(String.valueOf(repuestosSeleccionados.get(repuesto.getId())));
+            holder.etCantidad.setText(String.valueOf(repuestosSeleccionados.get(repuesto.getDocumentId())));
         } else {
             holder.etCantidad.setText("");
         }
@@ -49,11 +49,11 @@ public class ReparacionRepuestoAdapter extends RecyclerView.Adapter<ReparacionRe
         holder.cbRepuesto.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 holder.etCantidad.setEnabled(true);
-                repuestosSeleccionados.put(repuesto.getId(), 1); // Cantidad por defecto
+                repuestosSeleccionados.put(repuesto.getDocumentId(), 1); // Cantidad por defecto
             } else {
                 holder.etCantidad.setEnabled(false);
                 holder.etCantidad.setText("");
-                repuestosSeleccionados.remove(repuesto.getId());
+                repuestosSeleccionados.remove(repuesto.getDocumentId());
             }
         });
     }

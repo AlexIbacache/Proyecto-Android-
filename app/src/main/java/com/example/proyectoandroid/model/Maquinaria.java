@@ -9,7 +9,7 @@ import java.util.List;
 public class Maquinaria {
 
     @DocumentId
-    private String id;
+    private String documentId;
     private String nombre;
     private String numeroIdentificador;
     private Timestamp fechaIngreso;
@@ -20,12 +20,12 @@ public class Maquinaria {
     // Constructor vacío requerido para Firestore
     public Maquinaria() {}
 
-    public String getId() {
-        return id;
+    public String getDocumentId() {
+        return documentId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setDocumentId(String documentId) {
+        this.documentId = documentId;
     }
 
     public String getNombre() {
