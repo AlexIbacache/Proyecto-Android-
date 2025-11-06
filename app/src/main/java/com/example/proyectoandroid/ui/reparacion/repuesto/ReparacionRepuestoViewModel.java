@@ -1,6 +1,7 @@
 package com.example.proyectoandroid.ui.reparacion.repuesto;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 public class ReparacionRepuestoViewModel extends AndroidViewModel {
 
+    private static final String TAG = "ReparacionRepuestoVM";
     private final RepuestoRepository repuestoRepository;
     private final LiveData<List<Repuesto>> catalogoRepuestos;
 
@@ -27,6 +29,7 @@ public class ReparacionRepuestoViewModel extends AndroidViewModel {
     public ReparacionRepuestoViewModel(@NonNull Application application) {
         super(application);
         repuestoRepository = new RepuestoRepository();
+        Log.d(TAG, "ViewModel inicializado, obteniendo catálogo de repuestos.");
         catalogoRepuestos = repuestoRepository.getCatalogoRepuestos();
     }
 
@@ -37,6 +40,7 @@ public class ReparacionRepuestoViewModel extends AndroidViewModel {
     public void actualizarSeleccion(String repuestoId, int cantidad) {
         Map<String, Integer> currentSelection = _repuestosSeleccionados.getValue();
         if (currentSelection != null) {
+            Log.d(TAG, "actualizarSeleccion: Id de repuesto=" + repuestoId + ", cantidad=" + cantidad);
             currentSelection.put(repuestoId, cantidad);
             _repuestosSeleccionados.setValue(currentSelection);
         }
@@ -45,6 +49,7 @@ public class ReparacionRepuestoViewModel extends AndroidViewModel {
     public void eliminarSeleccion(String repuestoId) {
         Map<String, Integer> currentSelection = _repuestosSeleccionados.getValue();
         if (currentSelection != null) {
+            Log.d(TAG, "eliminarSeleccion: Id de repuesto=" + repuestoId);
             currentSelection.remove(repuestoId);
             _repuestosSeleccionados.setValue(currentSelection);
         }

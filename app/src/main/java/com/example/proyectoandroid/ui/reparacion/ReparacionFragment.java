@@ -18,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -106,7 +107,30 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
             viewModel.guardarReparacion(notas);
         });
         
-        btnFinalizarReparacion.setOnClickListener(v -> viewModel.finalizarReparacion());
+        btnFinalizarReparacion.setOnClickListener(v -> showConfirmarFinalizarDialog());
+    }
+    
+    private void showConfirmarFinalizarDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_confirmar_finalizar_reparacion, null);
+        builder.setView(dialogView);
+
+        final AlertDialog dialog = builder.create();
+
+        MaterialButton btnSi = dialogView.findViewById(R.id.btnDialogSi);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btnDialogNo);
+
+        btnSi.setOnClickListener(v -> {
+            viewModel.finalizarReparacion();
+            dialog.dismiss();
+        });
+
+        btnNo.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private void setupRecyclerView() {
@@ -207,7 +231,18 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
         viewModel.getReparacionFinalizadaState().observe(getViewLifecycleOwner(), success -> {
             if (success == null) return;
             if (success) {
-                Toast.makeText(getContext(), "Reparación Finalizada", Toast.LENGTH_SHORT).show();
+                Maquinaria maquinaSeleccionada = null;
+                int selectedPosition = spinnerMaquinaria.getSelectedItemPosition();
+                if (selectedPosition > 0 && maquinariaList != null && !maquinariaList.isEmpty()) {
+                    maquinaSeleccionada = maquinariaList.get(selectedPosition - 1);
+                }
+
+                if (maquinaSeleccionada != null) {
+                    String mensaje = "Reparación finalizada y guardada para la máquina " + maquinaSeleccionada.getNombre() + " (ID: " + maquinaSeleccionada.getDocumentId() + ")";
+                    Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getContext(), "Reparación Finalizada", Toast.LENGTH_SHORT).show();
+                }
                 limpiarFormularioCompleto();
             } else {
                 Toast.makeText(getContext(), "Error al finalizar la reparación.", Toast.LENGTH_SHORT).show();

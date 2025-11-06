@@ -1,5 +1,6 @@
 package com.example.proyectoandroid.ui.maquinaria;
 
+import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class MaquinariaViewModel extends ViewModel {
 
+    private static final String TAG = "MaquinariaViewModel";
     private final MaquinariaRepository repository;
     private final LiveData<List<Maquinaria>> maquinarias;
 
@@ -30,6 +32,7 @@ public class MaquinariaViewModel extends ViewModel {
     public MaquinariaViewModel() {
         repository = new MaquinariaRepository();
         maquinarias = repository.getMaquinariaList();
+        Log.d(TAG, "ViewModel inicializado, LiveData de maquinarias creado.");
     }
 
     public LiveData<List<Maquinaria>> getMaquinarias() {
@@ -37,21 +40,39 @@ public class MaquinariaViewModel extends ViewModel {
     }
 
     public void onMaquinaSeleccionada(Maquinaria maquina) {
+        if (maquina != null) {
+            Log.d(TAG, "onMaquinaSeleccionada: " + maquina.getNombre());
+        } else {
+            Log.d(TAG, "onMaquinaSeleccionada: nulo");
+        }
         _maquinaSeleccionada.setValue(maquina);
     }
 
     public void eliminarMaquinaSeleccionada(Maquinaria maquinaAEliminar) {
         if (maquinaAEliminar != null) {
+            Log.d(TAG, "eliminarMaquinaSeleccionada llamada para: " + maquinaAEliminar.getNombre());
             repository.eliminarMaquinaria(maquinaAEliminar.getDocumentId());
             onMaquinaSeleccionada(null); // Limpia la selección
+        } else {
+            Log.w(TAG, "eliminarMaquinaSeleccionada llamada con maquinaria nula.");
         }
     }
 
     public void eliminarParte(int position) {
         Maquinaria maquinaActual = _maquinaSeleccionada.getValue();
         if (maquinaActual != null && maquinaActual.getPartesPrincipales() != null && position < maquinaActual.getPartesPrincipales().size()) {
+            String parteEliminada = maquinaActual.getPartesPrincipales().get(position);
+            Log.d(TAG, "Intentando eliminar la parte '" + parteEliminada + "' en la posición " + position);
             maquinaActual.getPartesPrincipales().remove(position);
-            repository.actualizarMaquinaria(maquinaActual, success -> {}); // Actualiza en Firestore
+            repository.actualizarMaquinaria(maquinaActual, success -> {
+                if(success) {
+                    Log.d(TAG, "Parte eliminada y maquinaria actualizada con éxito.");
+                } else {
+                    Log.e(TAG, "Falló la actualización de la maquinaria después de eliminar la parte.");
+                }
+            });
+        } else {
+            Log.w(TAG, "eliminarParte falló: Estado o posición inválidos.");
         }
     }
 
@@ -59,9 +80,19 @@ public class MaquinariaViewModel extends ViewModel {
         Maquinaria maquinaActual = _maquinaSeleccionada.getValue();
         if (maquinaActual != null && maquinaActual.getPartesPrincipales() != null && position < maquinaActual.getPartesPrincipales().size()) {
             if (nuevoNombre != null && !nuevoNombre.trim().isEmpty()) {
+                String parteAntigua = maquinaActual.getPartesPrincipales().get(position);
+                Log.d(TAG, "Intentando actualizar la parte '" + parteAntigua + "' a '" + nuevoNombre + "'");
                 maquinaActual.getPartesPrincipales().set(position, nuevoNombre);
-                repository.actualizarMaquinaria(maquinaActual, success -> {}); // Actualiza en Firestore
+                repository.actualizarMaquinaria(maquinaActual, success -> {
+                    if(success) {
+                        Log.d(TAG, "Parte actualizada y maquinaria actualizada con éxito.");
+                    } else {
+                        Log.e(TAG, "Falló la actualización de la maquinaria después de actualizar la parte.");
+                    }
+                }); 
             }
+        } else {
+            Log.w(TAG, "actualizarParte falló: Estado o posición inválidos.");
         }
     }
 }

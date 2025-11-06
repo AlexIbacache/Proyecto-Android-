@@ -1,5 +1,6 @@
 package com.example.proyectoandroid.data;
 
+import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -12,14 +13,17 @@ import java.util.List;
 
 public class RepuestoRepository {
 
+    private static final String TAG = "RepuestoRepository";
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public LiveData<List<Repuesto>> getCatalogoRepuestos() {
         MutableLiveData<List<Repuesto>> repuestosLiveData = new MutableLiveData<>();
+        Log.d(TAG, "Obteniendo catálogo de repuestos");
 
         db.collection("repuestos") // Asumiendo que tienes una colección "repuestos" a nivel raíz
             .addSnapshotListener((snapshots, e) -> {
                 if (e != null) {
+                    Log.e(TAG, "Error al obtener el catálogo de repuestos", e);
                     repuestosLiveData.postValue(null);
                     return;
                 }
@@ -30,6 +34,7 @@ public class RepuestoRepository {
                         Repuesto repuesto = doc.toObject(Repuesto.class);
                         repuestos.add(repuesto);
                     }
+                    Log.d(TAG, "Catálogo de repuestos obtenido con éxito. Cantidad: " + repuestos.size());
                 }
                 repuestosLiveData.postValue(repuestos);
             });

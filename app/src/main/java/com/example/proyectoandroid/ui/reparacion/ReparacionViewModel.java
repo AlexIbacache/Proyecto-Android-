@@ -1,6 +1,8 @@
 package com.example.proyectoandroid.ui.reparacion;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -25,6 +27,7 @@ import java.util.Map;
 
 public class ReparacionViewModel extends AndroidViewModel {
 
+    private static final String TAG = "ReparacionViewModel";
     private final MaquinariaRepository maquinariaRepository;
     private final LiveData<List<Maquinaria>> maquinarias;
     private final Map<String, List<Repuesto>> repuestosPorParte = new HashMap<>();
@@ -56,6 +59,7 @@ public class ReparacionViewModel extends AndroidViewModel {
         super(application);
         maquinariaRepository = new MaquinariaRepository();
         maquinarias = maquinariaRepository.getMaquinariaList();
+        Log.d(TAG, "ViewModel inicializado");
     }
 
     public boolean isEditMode() {
@@ -69,20 +73,24 @@ public class ReparacionViewModel extends AndroidViewModel {
     public void onMaquinariaSelected(Maquinaria maquinaria) {
         this.maquinaSeleccionada = maquinaria;
         if (maquinaria == null) {
+            Log.d(TAG, "Selección de maquinaria borrada.");
             limpiarFormulario();
             return;
         }
-
+        Log.d(TAG, "Maquinaria seleccionada: " + maquinaria.getNombre() + ". Comprobando si hay reparaciones abiertas.");
         maquinariaRepository.getReparacionAbierta(maquinaria.getDocumentId(), reparacion -> {
             if (reparacion != null) {
+                Log.d(TAG, "Reparación abierta encontrada, cargando para editar.");
                 cargarReparacionParaEdicion(reparacion, maquinaria);
             } else {
+                Log.d(TAG, "No se encontraron reparaciones abiertas, preparando para una nueva reparación.");
                 limpiarParaNuevaReparacion(maquinaria);
             }
         });
     }
 
     public void cargarReparacionParaEdicion(Reparacion reparacion, Maquinaria maquinaria) {
+        Log.d(TAG, "cargarReparacionParaEdicion llamado para el ID de reparación: " + reparacion.getDocumentId());
         this.reparacionEnEdicion = reparacion;
         this.maquinaSeleccionada = maquinaria;
 
@@ -92,6 +100,7 @@ public class ReparacionViewModel extends AndroidViewModel {
 
         repuestosPorParte.clear();
         if (reparacion.getPartesReparadas() != null) {
+            Log.d(TAG, "Cargando " + reparacion.getPartesReparadas().size() + " partes reparadas.");
             for (ParteReparada parte : reparacion.getPartesReparadas()) {
                 repuestosPorParte.put(parte.getNombreParte(), new ArrayList<>(parte.getRepuestos()));
             }
@@ -101,6 +110,7 @@ public class ReparacionViewModel extends AndroidViewModel {
     }
 
     private void limpiarParaNuevaReparacion(Maquinaria maquinaria) {
+        Log.d(TAG, "limpiarParaNuevaReparacion para la máquina: " + maquinaria.getNombre());
         this.reparacionEnEdicion = null;
         this.maquinaSeleccionada = maquinaria;
         _selectedDate.postValue(null);
@@ -110,13 +120,18 @@ public class ReparacionViewModel extends AndroidViewModel {
     }
 
     public void onFechaClicked() {
+        Log.d(TAG, "onFechaClicked llamado");
         Calendar calendar = Calendar.getInstance();
         _showDatePickerEvent.setValue(new int[]{calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)});
     }
 
-    public void onDateSelected(String date) { _selectedDate.setValue(date); }
+    public void onDateSelected(String date) { 
+        Log.d(TAG, "onDateSelected: " + date);
+        _selectedDate.setValue(date); 
+    }
 
     public void actualizarRepuestosParaParte(String parte, List<Repuesto> repuestos) {
+        Log.d(TAG, "actualizarRepuestosParaParte para la parte '" + parte + "' con " + repuestos.size() + " repuestos.");
         repuestosPorParte.put(parte, repuestos);
     }
 
@@ -125,7 +140,9 @@ public class ReparacionViewModel extends AndroidViewModel {
     }
 
     public void guardarReparacion(String notas) {
+        Log.d(TAG, "guardarReparacion llamado.");
         if (maquinaSeleccionada == null || _selectedDate.getValue() == null || _selectedDate.getValue().isEmpty()) {
+            Log.e(TAG, "Falló el guardado: No se seleccionó máquina o fecha.");
             _reparacionGuardadaState.setValue(false);
             return;
         }
@@ -139,16 +156,23 @@ public class ReparacionViewModel extends AndroidViewModel {
             for (Map.Entry<String, List<Repuesto>> entry : repuestosPorParte.entrySet()) {
                 partesReparadasList.add(new ParteReparada(entry.getKey(), entry.getValue()));
             }
+            Log.d(TAG, "Guardando con " + partesReparadasList.size() + " partes reparadas.");
 
             if (reparacionEnEdicion != null) {
+                Log.d(TAG, "Actualizando reparación existente con ID: " + reparacionEnEdicion.getDocumentId());
                 reparacionEnEdicion.setFecha(timestamp);
                 reparacionEnEdicion.setNotas(notas);
                 reparacionEnEdicion.setPartesReparadas(partesReparadasList);
 
-                maquinariaRepository.actualizarReparacion(maquinaSeleccionada.getDocumentId(), reparacionEnEdicion, success -> _reparacionGuardadaState.postValue(success));
+                maquinariaRepository.actualizarReparacion(maquinaSeleccionada.getDocumentId(), reparacionEnEdicion, success -> {
+                    Log.d(TAG, "Resultado de actualizarReparacion: " + success);
+                    _reparacionGuardadaState.postValue(success);
+                });
             } else {
+                Log.d(TAG, "Creando nueva reparación.");
                 Reparacion nuevaReparacion = new Reparacion(timestamp, notas, partesReparadasList);
                 maquinariaRepository.guardarReparacion(maquinaSeleccionada.getDocumentId(), nuevaReparacion, success -> {
+                    Log.d(TAG, "Resultado de guardarReparacion: " + success);
                     if (success) {
                         maquinaSeleccionada.setEstado(false); // En Reparación
                         maquinariaRepository.actualizarMaquinaria(maquinaSeleccionada, updateSuccess -> _reparacionGuardadaState.postValue(updateSuccess));
@@ -159,14 +183,18 @@ public class ReparacionViewModel extends AndroidViewModel {
             }
 
         } catch (ParseException e) {
+            Log.e(TAG, "Error al analizar la fecha para guardar.", e);
             _reparacionGuardadaState.setValue(false);
         }
     }
 
     public void finalizarReparacion() {
+        Log.d(TAG, "finalizarReparacion llamado.");
         if (reparacionEnEdicion != null && maquinaSeleccionada != null) {
+            Log.d(TAG, "Finalizando reparación con ID: " + reparacionEnEdicion.getDocumentId());
             reparacionEnEdicion.setEstado("Cerrada");
             maquinariaRepository.actualizarReparacion(maquinaSeleccionada.getDocumentId(), reparacionEnEdicion, success -> {
+                Log.d(TAG, "Resultado de finalizarReparacion: " + success);
                 if (success) {
                     maquinaSeleccionada.setEstado(true); // Operativa
                     maquinariaRepository.actualizarMaquinaria(maquinaSeleccionada, updateSuccess -> _reparacionFinalizadaState.postValue(updateSuccess));
@@ -174,15 +202,19 @@ public class ReparacionViewModel extends AndroidViewModel {
                     _reparacionFinalizadaState.postValue(false);
                 }
             });
+        } else {
+            Log.w(TAG, "Falló la finalización de la reparación: No hay reparación en modo de edición o no se ha seleccionado ninguna máquina.");
         }
     }
 
     public void resetSaveState() {
+        Log.d(TAG, "resetSaveState llamado");
         _reparacionGuardadaState.setValue(null);
         _reparacionFinalizadaState.setValue(null);
     }
 
     public void limpiarFormulario() {
+        Log.d(TAG, "limpiarFormulario llamado");
         maquinaSeleccionada = null;
         reparacionEnEdicion = null;
         _selectedDate.setValue(null);

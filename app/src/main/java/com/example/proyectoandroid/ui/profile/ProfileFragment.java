@@ -37,6 +37,7 @@ public class ProfileFragment extends Fragment {
 
     private TextView tvUbicacion;
     private TextView tvEmail;
+    private TextView tvNombre;
     private ProfileViewModel profileViewModel;
     private FusedLocationProviderClient fusedLocationClient;
 
@@ -57,11 +58,16 @@ public class ProfileFragment extends Fragment {
 
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
 
+        tvNombre = view.findViewById(R.id.tvNombre);
         tvEmail = view.findViewById(R.id.tvEmail);
         tvUbicacion = view.findViewById(R.id.tvUbicacion);
         Button btnCerrarS = view.findViewById(R.id.btnCerrarS);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        profileViewModel.getUserName().observe(getViewLifecycleOwner(), name -> {
+            tvNombre.setText(name != null && !name.isEmpty() ? name : "Nombre no disponible");
+        });
 
         profileViewModel.getUserEmail().observe(getViewLifecycleOwner(), email -> {
             tvEmail.setText(email);
