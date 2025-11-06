@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
-    tools:context=".ui.reparacion.ReparacionRepuestoFragment">
+    tools:context=".ui.reparacion.repuesto.ReparacionRepuestoFragment">
 
     <TextView
         android:id="@+id/tvTituloRepuesto"

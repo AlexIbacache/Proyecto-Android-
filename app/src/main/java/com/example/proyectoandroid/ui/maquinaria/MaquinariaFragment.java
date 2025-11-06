@@ -1,14 +1,15 @@
 package com.example.proyectoandroid.ui.maquinaria;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,17 +27,14 @@ import com.example.proyectoandroid.model.Maquinaria;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class MaquinariaFragment extends Fragment {
+public class MaquinariaFragment extends Fragment implements PartesAdapter.OnPartInteractionListener {
 
     private MaquinariaViewModel viewModel;
     private PartesAdapter partesAdapter;
-    private ArrayAdapter<String> spinnerAdapter;
     private Spinner spinnerMaquinarias;
-    private boolean isSpinnerInitialSetup = true;
-    private List<Maquinaria> mockMaquinariaList = new ArrayList<>(); // Lista para datos de ejemplo
+    private List<Maquinaria> maquinariaList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -51,84 +48,48 @@ public class MaquinariaFragment extends Fragment {
         ImageButton btnEliminarM = view.findViewById(R.id.btnEliminarMaquinaria);
 
         setupRecyclerView(recyclerViewPartes);
-
         viewModel = new ViewModelProvider(this).get(MaquinariaViewModel.class);
 
-        // --- INICIO: Código de ejemplo para previsualización ---
-        createMockDataAndSetupSpinner();
-        // --- FIN: Código de ejemplo para previsualización ---
-
-        // observeViewModel(btnModificarM, btnEliminarM); // Comentado para usar datos de ejemplo
-
+        observeViewModel(btnModificarM, btnEliminarM);
         setupListeners(btnModificarM, btnEliminarM, btnRegistrar);
 
         return view;
     }
 
-    private void createMockDataAndSetupSpinner() {
-        // Crear datos de ejemplo
-        Maquinaria maquina1 = new Maquinaria();
-        maquina1.setNombre("Excavadora 320D");
-        maquina1.setPartesPrincipales(Arrays.asList("Cuchara Principal", "Motor Diesel", "Sistema Hidráulico", "Orugas de Acero"));
-
-        Maquinaria maquina2 = new Maquinaria();
-        maquina2.setNombre("Cargador Frontal 980H");
-        maquina2.setPartesPrincipales(Arrays.asList("Neumáticos", "Cabina del Operador", "Motor", "Balde de Carga"));
-
-        mockMaquinariaList.add(maquina1);
-        mockMaquinariaList.add(maquina2);
-
-        // Poblar el Spinner
-        List<String> nombres = new ArrayList<>();
-        nombres.add("Seleccione una maquinaria...");
-        for (Maquinaria m : mockMaquinariaList) {
-            nombres.add(m.getNombre());
-        }
-
-        spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, nombres) {
-            @Override
-            public boolean isEnabled(int position) {
-                // Deshabilita el primer item (el "hint")
-                return position != 0;
-            }
-
-            @Override
-            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                if (position == 0) {
-                    // Estilo para el "hint"
-                    tv.setTextColor(Color.GRAY);
-                } else {
-                    tv.setTextColor(Color.BLACK);
-                }
-                return view;
-            }
-        };
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMaquinarias.setAdapter(spinnerAdapter);
-    }
-
     private void setupRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        partesAdapter = new PartesAdapter(new ArrayList<>());
+        partesAdapter = new PartesAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(partesAdapter);
     }
 
     private void observeViewModel(ImageButton btnModificar, ImageButton btnEliminar) {
-        viewModel.maquinarias.observe(getViewLifecycleOwner(), maquinarias -> {
-            List<String> nombres = new ArrayList<>();
-            nombres.add("Seleccione una maquinaria...");
-            for (Maquinaria m : maquinarias) {
-                nombres.add(m.getNombre());
+        viewModel.getMaquinarias().observe(getViewLifecycleOwner(), maquinarias -> {
+            if (maquinarias != null && getContext() != null) {
+                maquinariaList.clear();
+                maquinariaList.addAll(maquinarias);
+                
+                List<String> nombres = new ArrayList<>();
+                nombres.add("Seleccione una maquinaria..."); // Hint para el spinner
+                for (Maquinaria m : maquinarias) {
+                    nombres.add(m.getNombre());
+                }
+
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item_custom, nombres);
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerMaquinarias.setAdapter(spinnerAdapter);
+
+                if (maquinarias.isEmpty()) {
+                    Toast.makeText(getContext(), "No hay maquinarias registradas", Toast.LENGTH_SHORT).show();
+                }
+            } else if (isAdded()) {
+                Toast.makeText(getContext(), "Error al cargar las maquinarias", Toast.LENGTH_SHORT).show();
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.custom_spinner_item, nombres);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerMaquinarias.setAdapter(adapter);
         });
 
         viewModel.partesSeleccionadas.observe(getViewLifecycleOwner(), partes -> {
-            partesAdapter.updateData(partes);
+            if (partes != null) {
+                partesAdapter.updateData(partes);
+            }
         });
 
         viewModel.botonesDeAccionVisibles.observe(getViewLifecycleOwner(), isVisible -> {
@@ -141,59 +102,85 @@ public class MaquinariaFragment extends Fragment {
         spinnerMaquinarias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 if (position == 0) {
-                    ((TextView) parent.getChildAt(0)).setTextColor(Color.GRAY);
-                 } else {
-                    ((TextView) parent.getChildAt(0)).setTextColor(Color.BLACK);
-                 }
-
-                if (isSpinnerInitialSetup) {
-                    isSpinnerInitialSetup = false;
-                    return;
-                }
-                // --- Lógica para datos de ejemplo ---
-                if (position > 0) {
-                    Maquinaria maquinaSeleccionada = mockMaquinariaList.get(position - 1);
-                    partesAdapter.updateData(maquinaSeleccionada.getPartesPrincipales());
-                    btnModificar.setVisibility(View.VISIBLE);
-                    btnEliminar.setVisibility(View.VISIBLE);
+                if (position == 0) {
+                    viewModel.onMaquinaSeleccionada(null);
                 } else {
-                    partesAdapter.updateData(new ArrayList<>());
-                    btnModificar.setVisibility(View.GONE);
-                    btnEliminar.setVisibility(View.GONE);
+                    viewModel.onMaquinaSeleccionada(maquinariaList.get(position - 1));
                 }
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                 partesAdapter.updateData(new ArrayList<>());
-                 btnModificar.setVisibility(View.GONE);
-                 btnEliminar.setVisibility(View.GONE);
+                viewModel.onMaquinaSeleccionada(null);
             }
         });
 
         btnEliminar.setOnClickListener(v -> {
             int position = spinnerMaquinarias.getSelectedItemPosition();
-            new AlertDialog.Builder(getContext())
-                    .setTitle("Eliminar Maquinaria")
-                    .setMessage("¿Estás seguro?")
-                    .setPositiveButton("Eliminar", (dialog, which) -> {
-                        Toast.makeText(getContext(), "Eliminado (ejemplo)", Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton("Cancelar", null)
-                    .show();
+            if (position > 0 && position <= maquinariaList.size()) {
+                Maquinaria maquinaAEliminar = maquinariaList.get(position - 1);
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Eliminar Maquinaria")
+                        .setMessage("¿Estás seguro de que quieres eliminar '" + maquinaAEliminar.getNombre() + "'?")
+                        .setPositiveButton("Eliminar", (dialog, which) -> viewModel.eliminarMaquinaSeleccionada(maquinaAEliminar))
+                        .setNegativeButton("Cancelar", null).show();
+            }
         });
 
-        btnRegistrar.setOnClickListener(v -> navigateToFormFragment());
+        btnRegistrar.setOnClickListener(v -> navigateToFormFragment(null));
 
         btnModificar.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Modificar... (Función próximamente)", Toast.LENGTH_SHORT).show();
+            int position = spinnerMaquinarias.getSelectedItemPosition();
+            if (position > 0 && position <= maquinariaList.size()) {
+                Maquinaria maquinaAEditar = maquinariaList.get(position - 1);
+                navigateToFormFragment(maquinaAEditar.getId());
+            } else {
+                Toast.makeText(getContext(), "Selecciona una maquinaria para editar", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    private void navigateToFormFragment() {
+    private void navigateToFormFragment(@Nullable String maquinariaId) {
+        MaquinariaFormFragment formFragment = new MaquinariaFormFragment();
+        if (maquinariaId != null) {
+            Bundle args = new Bundle();
+            args.putString("maquinariaId", maquinariaId);
+            formFragment.setArguments(args);
+        }
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, new MaquinariaFormFragment())
+                .replace(R.id.fragment_container, formFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    public void onEditPart(int position, String currentName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Editar Nombre de la Parte");
+
+        final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setText(currentName);
+        builder.setView(input);
+
+        builder.setPositiveButton("Guardar", (dialog, which) -> {
+            String nuevoNombre = input.getText().toString();
+            viewModel.actualizarParte(position, nuevoNombre);
+        });
+        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    @Override
+    public void onDeletePart(int position) {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Eliminar Parte")
+                .setMessage("¿Estás seguro de que quieres eliminar esta parte?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    viewModel.eliminarParte(position);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 }

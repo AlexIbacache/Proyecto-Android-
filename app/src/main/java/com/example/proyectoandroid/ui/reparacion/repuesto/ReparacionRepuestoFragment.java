@@ -35,9 +35,11 @@ public class ReparacionRepuestoFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(ReparacionRepuestoViewModel.class);
 
+        // 1. Inicializar las vistas primero
         rvRepuestosCatalogo = view.findViewById(R.id.rvRepuestosCatalogo);
         MaterialButton btnConfirmar = view.findViewById(R.id.btnConfirmarRepuestos);
 
+        // 2. Luego, configurar el RecyclerView
         setupRecyclerView();
         loadMockData();
 

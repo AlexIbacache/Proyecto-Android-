@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,9 +17,17 @@ import java.util.List;
 public class PartesAdapter extends RecyclerView.Adapter<PartesAdapter.ParteViewHolder> {
 
     private List<String> partes;
+    private OnPartInteractionListener listener;
 
-    public PartesAdapter(List<String> partes) {
+    // Interfaz para manejar los clics en los iconos
+    public interface OnPartInteractionListener {
+        void onEditPart(int position, String currentName);
+        void onDeletePart(int position);
+    }
+
+    public PartesAdapter(List<String> partes, OnPartInteractionListener listener) {
         this.partes = partes;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,17 +43,21 @@ public class PartesAdapter extends RecyclerView.Adapter<PartesAdapter.ParteViewH
         holder.tvNombreParte.setText(parte);
 
         holder.btnModificarParte.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Modificar: " + parte, Toast.LENGTH_SHORT).show();
+            if (listener != null) {
+                listener.onEditPart(position, parte);
+            }
         });
 
         holder.btnEliminarParte.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Eliminar: " + parte, Toast.LENGTH_SHORT).show();
+            if (listener != null) {
+                listener.onDeletePart(position);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return partes.size();
+        return partes != null ? partes.size() : 0;
     }
 
     public void updateData(List<String> nuevasPartes) {

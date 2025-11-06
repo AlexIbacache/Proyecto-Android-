@@ -47,6 +47,25 @@ public class MaquinariaRepository {
         return maquinariaLiveData;
     }
 
+    public LiveData<Maquinaria> getMaquinariaById(String maquinariaId) {
+        MutableLiveData<Maquinaria> maquinariaLiveData = new MutableLiveData<>();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser != null && maquinariaId != null) {
+            db.collection("users").document(currentUser.getUid()).collection("maquinaria").document(maquinariaId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        maquinariaLiveData.postValue(documentSnapshot.toObject(Maquinaria.class));
+                    } else {
+                        maquinariaLiveData.postValue(null);
+                    }
+                })
+                .addOnFailureListener(e -> maquinariaLiveData.postValue(null));
+        }
+        return maquinariaLiveData;
+    }
+
     public LiveData<List<Reparacion>> getReparacionesDeMaquina(String maquinariaId) {
         MutableLiveData<List<Reparacion>> reparacionesLiveData = new MutableLiveData<>();
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -81,6 +100,21 @@ public class MaquinariaRepository {
               .add(maquinaria)
               .addOnSuccessListener(documentReference -> callback.onComplete(true))
               .addOnFailureListener(e -> callback.onComplete(false));
+        } else {
+            callback.onComplete(false);
+        }
+    }
+
+    public void actualizarMaquinaria(Maquinaria maquinaria, FirestoreCallback callback) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null && maquinaria.getId() != null) {
+            db.collection("users").document(currentUser.getUid())
+              .collection("maquinaria").document(maquinaria.getId())
+              .set(maquinaria)
+              .addOnSuccessListener(aVoid -> callback.onComplete(true))
+              .addOnFailureListener(e -> callback.onComplete(false));
+        } else {
+            callback.onComplete(false);
         }
     }
 
