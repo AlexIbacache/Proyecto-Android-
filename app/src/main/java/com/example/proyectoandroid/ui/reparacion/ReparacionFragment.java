@@ -39,6 +39,7 @@ import java.util.Locale;
 public class ReparacionFragment extends Fragment implements ReparacionPartesAdapter.OnItemClickListener {
 
     private ReparacionViewModel viewModel;
+    private SharedReparacionViewModel sharedViewModel;
     private Spinner spinnerMaquinaria;
     private TextInputEditText etFecha, etNotas;
     private RecyclerView recyclerViewPartes;
@@ -46,10 +47,13 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
     private List<Maquinaria> maquinariaList = new ArrayList<>();
     private ActivityResultLauncher<Intent> repuestoActivityResultLauncher;
     private String parteSeleccionada;
+    private MaterialButton btnFinalizarReparacion;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedReparacionViewModel.class);
 
         repuestoActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -80,16 +84,29 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
         etNotas = view.findViewById(R.id.etNotas);
         recyclerViewPartes = view.findViewById(R.id.recyclerViewPartesReparacion);
         MaterialButton btnGuardar = view.findViewById(R.id.btnGuardarReparacion);
+        btnFinalizarReparacion = view.findViewById(R.id.btnFinalizarReparacion);
 
         setupRecyclerView();
         setupSpinner();
         setupObservers();
+
+        sharedViewModel.getReparacionParaEditar().observe(getViewLifecycleOwner(), reparacion -> {
+            if (reparacion != null) {
+                Maquinaria maquina = sharedViewModel.getMaquinaDeLaReparacion().getValue();
+                if (maquina != null) {
+                    viewModel.cargarReparacionParaEdicion(reparacion, maquina);
+                    sharedViewModel.clearData(); 
+                }
+            }
+        });
 
         etFecha.setOnClickListener(v -> viewModel.onFechaClicked());
         btnGuardar.setOnClickListener(v -> {
             String notas = etNotas.getText() != null ? etNotas.getText().toString() : "";
             viewModel.guardarReparacion(notas);
         });
+        
+        btnFinalizarReparacion.setOnClickListener(v -> viewModel.finalizarReparacion());
     }
 
     private void setupRecyclerView() {
@@ -124,7 +141,7 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
 
     private void setupObservers() {
         viewModel.getMaquinarias().observe(getViewLifecycleOwner(), maquinarias -> {
-            if (maquinarias != null && !maquinarias.isEmpty()) {
+             if (maquinarias != null && !maquinarias.isEmpty()) {
                 this.maquinariaList.clear();
                 this.maquinariaList.addAll(maquinarias);
 
@@ -137,6 +154,19 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
                 ArrayAdapter<String> spinnerAdapter = createSpinnerAdapter(nombresMaquinas);
                 spinnerMaquinaria.setAdapter(spinnerAdapter);
                 spinnerMaquinaria.setEnabled(true);
+
+                viewModel.getMaquinaASeleccionar().observe(getViewLifecycleOwner(), maquinaId -> {
+                    if (maquinaId != null) {
+                        for (int i = 0; i < maquinariaList.size(); i++) {
+                            if (maquinariaList.get(i).getDocumentId().equals(maquinaId)) {
+                                spinnerMaquinaria.setSelection(i + 1);
+                                break;
+                            }
+                        }
+                    } else {
+                        spinnerMaquinaria.setSelection(0);
+                    }
+                });
             } else {
                 this.maquinariaList.clear();
                 List<String> emptyList = new ArrayList<>();
@@ -149,6 +179,8 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
 
         viewModel.getPartesMaquinaria().observe(getViewLifecycleOwner(), partes -> {
             adapter.updateData(partes != null ? partes : new ArrayList<>());
+            // Controlar visibilidad del botón Finalizar
+            btnFinalizarReparacion.setVisibility(viewModel.isEditMode() ? View.VISIBLE : View.GONE);
         });
 
         viewModel.getShowDatePickerEvent().observe(getViewLifecycleOwner(), e -> showDatePickerDialog());
@@ -160,25 +192,41 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
         viewModel.getReparacionGuardadaState().observe(getViewLifecycleOwner(), success -> {
             if (success == null) return;
             if (success) {
-                Toast.makeText(getContext(), "Reparación guardada con éxito", Toast.LENGTH_SHORT).show();
-                limpiarFormularioCompleto();
+                if (viewModel.isEditMode()) {
+                    Toast.makeText(getContext(), "Cambios guardados con éxito", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Reparación guardada con éxito", Toast.LENGTH_SHORT).show();
+                    limpiarFormularioCompleto();
+                }
             } else {
-                Toast.makeText(getContext(), "Error al guardar la reparación. Verifique los datos.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Error al guardar. Verifique los datos.", Toast.LENGTH_LONG).show();
             }
             viewModel.resetSaveState();
+        });
+        
+        viewModel.getReparacionFinalizadaState().observe(getViewLifecycleOwner(), success -> {
+            if (success == null) return;
+            if (success) {
+                Toast.makeText(getContext(), "Reparación Finalizada", Toast.LENGTH_SHORT).show();
+                limpiarFormularioCompleto();
+            } else {
+                Toast.makeText(getContext(), "Error al finalizar la reparación.", Toast.LENGTH_SHORT).show();
+            }
+            viewModel.resetSaveState();
+        });
+        
+        viewModel.getNotasEdicion().observe(getViewLifecycleOwner(), notas -> {
+            etNotas.setText(notas);
         });
     }
 
     private void limpiarFormularioCompleto() {
         viewModel.limpiarFormulario();
-        spinnerMaquinaria.setSelection(0);
-        etFecha.setText("");
-        etNotas.setText("");
-        adapter.updateData(new ArrayList<>());
+        // No es necesario limpiar el spinner aquí, el observer de maquinaASeleccionar se encargará
     }
 
     private ArrayAdapter<String> createSpinnerAdapter(List<String> items) {
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, items) {
+        return new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, items) {
             @Override
             public boolean isEnabled(int position) {
                 return position != 0;
@@ -192,8 +240,6 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
                 return view;
             }
         };
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        return spinnerAdapter;
     }
 
     private void showDatePickerDialog() {
@@ -214,14 +260,19 @@ public class ReparacionFragment extends Fragment implements ReparacionPartesAdap
         Intent intent = new Intent(getActivity(), RepuestoActivity.class);
         intent.putExtra(RepuestoActivity.EXTRA_PARTE_NOMBRE, parte);
 
-        // --- NUEVA LÓGICA ---
-        // Obtenemos los repuestos que ya existen para esta parte
         List<Repuesto> repuestosExistentes = viewModel.getRepuestosParaParte(parte);
         if (repuestosExistentes != null && !repuestosExistentes.isEmpty()) {
-            // Si existen, los añadimos al intent para que la siguiente pantalla los reciba
             intent.putExtra(RepuestoActivity.EXTRA_REPUESTOS_LISTA, (Serializable) repuestosExistentes);
         }
 
         repuestoActivityResultLauncher.launch(intent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (isRemoving() || (getParentFragment() != null && getParentFragment().isRemoving())) {
+            viewModel.limpiarFormulario();
+        }
     }
 }

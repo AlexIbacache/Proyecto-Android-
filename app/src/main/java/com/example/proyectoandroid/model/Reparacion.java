@@ -11,8 +11,8 @@ public class Reparacion {
     private String documentId;
     private Timestamp fecha;
     private String notas;
-    // Cambiamos el Map por una lista de nuestro nuevo objeto
     private List<ParteReparada> partesReparadas;
+    private String estado; // "Abierta" o "Cerrada"
 
     // Constructor vacío requerido para Firestore
     public Reparacion() {}
@@ -21,6 +21,7 @@ public class Reparacion {
         this.fecha = fecha;
         this.notas = notas;
         this.partesReparadas = partesReparadas;
+        this.estado = "Abierta"; // Por defecto, una nueva reparación está abierta
     }
 
     public String getDocumentId() {
@@ -53,5 +54,13 @@ public class Reparacion {
 
     public void setPartesReparadas(List<ParteReparada> partesReparadas) {
         this.partesReparadas = partesReparadas;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

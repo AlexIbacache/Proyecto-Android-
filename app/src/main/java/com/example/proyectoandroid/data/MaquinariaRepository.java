@@ -8,6 +8,7 @@ import com.example.proyectoandroid.model.Reparacion;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class MaquinariaRepository {
 
     public interface FirestoreCallback {
         void onComplete(boolean success);
+    }
+    
+    public interface ReparacionCallback {
+        void onComplete(Reparacion reparacion);
     }
 
     public LiveData<List<Maquinaria>> getMaquinariaList() {
@@ -45,6 +50,29 @@ public class MaquinariaRepository {
                 });
         }
         return maquinariaLiveData;
+    }
+    
+    public void getReparacionAbierta(String maquinariaId, ReparacionCallback callback) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null && maquinariaId != null) {
+            db.collection("users").document(currentUser.getUid())
+                    .collection("maquinaria").document(maquinariaId)
+                    .collection("reparaciones")
+                    .whereEqualTo("estado", "Abierta")
+                    .limit(1)
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                            // Si encontramos una, la devolvemos
+                            callback.onComplete(task.getResult().getDocuments().get(0).toObject(Reparacion.class));
+                        } else {
+                            // Si no, devolvemos null
+                            callback.onComplete(null);
+                        }
+                    });
+        } else {
+            callback.onComplete(null);
+        }
     }
 
     public LiveData<Maquinaria> getMaquinariaById(String maquinariaId) {
@@ -113,6 +141,20 @@ public class MaquinariaRepository {
                     .collection("reparaciones")
                     .add(reparacion)
                     .addOnSuccessListener(documentReference -> callback.onComplete(true))
+                    .addOnFailureListener(e -> callback.onComplete(false));
+        } else {
+            callback.onComplete(false);
+        }
+    }
+
+    public void actualizarReparacion(String maquinariaId, Reparacion reparacion, FirestoreCallback callback) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null && maquinariaId != null && reparacion.getDocumentId() != null) {
+            db.collection("users").document(currentUser.getUid())
+                    .collection("maquinaria").document(maquinariaId)
+                    .collection("reparaciones").document(reparacion.getDocumentId())
+                    .set(reparacion)
+                    .addOnSuccessListener(aVoid -> callback.onComplete(true))
                     .addOnFailureListener(e -> callback.onComplete(false));
         } else {
             callback.onComplete(false);
