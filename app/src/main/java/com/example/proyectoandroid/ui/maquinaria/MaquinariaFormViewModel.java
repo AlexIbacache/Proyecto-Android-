@@ -5,9 +5,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.proyectoandroid.data.MaquinariaRepository;
+import com.example.proyectoandroid.model.Maquinaria;
 import com.example.proyectoandroid.util.SingleLiveEvent;
+import com.google.firebase.Timestamp;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class MaquinariaFormViewModel extends ViewModel {
@@ -35,11 +38,6 @@ public class MaquinariaFormViewModel extends ViewModel {
         this.repository = new MaquinariaRepository();
     }
 
-    public void onFechaIngresoClicked() {
-        // La lógica para mostrar el diálogo está en la vista.
-        // El ViewModel puede proporcionar datos iniciales si es necesario.
-    }
-
     public void setFechaIngreso(int year, int month, int dayOfMonth) {
         String selectedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, month + 1, year);
         _fechaIngreso.setValue(selectedDate);
@@ -62,9 +60,23 @@ public class MaquinariaFormViewModel extends ViewModel {
         }
     }
 
-    public void guardarMaquinaria(/* Aquí recibirías los datos de la maquinaria desde el Fragment */) {
-        // Lógica para recolectar datos de las vistas y guardar en el repositorio...
-        // Por ahora, simulamos un guardado exitoso.
-        _saveMaquinariaEvent.setValue(true);
+    public void guardarMaquinaria(String nombre, List<String> partes) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            _saveMaquinariaEvent.setValue(false);
+            return;
+        }
+
+        Maquinaria nuevaMaquinaria = new Maquinaria();
+        nuevaMaquinaria.setNombre(nombre);
+        nuevaMaquinaria.setPartesPrincipales(partes);
+        nuevaMaquinaria.setFechaIngreso(new Timestamp(Calendar.getInstance().getTime()));
+        nuevaMaquinaria.setEstado(false); // Por defecto, en reparación
+
+        repository.guardarMaquinaria(nuevaMaquinaria, new MaquinariaRepository.FirestoreCallback() {
+            @Override
+            public void onComplete(boolean success) {
+                _saveMaquinariaEvent.postValue(success);
+            }
+        });
     }
 }

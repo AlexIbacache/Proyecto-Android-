@@ -1,10 +1,10 @@
 package com.example.proyectoandroid.ui.maquinaria;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,17 +18,15 @@ import java.util.List;
 public class PartesAdapter extends RecyclerView.Adapter<PartesAdapter.ParteViewHolder> {
 
     private List<String> partes;
-    private Context context;
 
-    public PartesAdapter(List<String> partes, Context context) {
+    public PartesAdapter(List<String> partes) {
         this.partes = partes;
-        this.context = context;
     }
 
     @NonNull
     @Override
     public ParteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_parte, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_parte, parent, false);
         return new ParteViewHolder(view);
     }
 
@@ -37,18 +35,12 @@ public class PartesAdapter extends RecyclerView.Adapter<PartesAdapter.ParteViewH
         String parte = partes.get(position);
         holder.tvNombreParte.setText(parte);
 
-        // Listener para el botón Modificar
         holder.btnModificarParte.setOnClickListener(v -> {
-            Toast.makeText(context, "Modificar: " + parte, Toast.LENGTH_SHORT).show();
-            // Aquí irá la lógica para abrir un diálogo o fragmento de edición
-            // Se podría notificar al ViewModel para que maneje esta acción.
+            Toast.makeText(v.getContext(), "Modificar: " + parte, Toast.LENGTH_SHORT).show();
         });
 
-        // Listener para el botón Eliminar
         holder.btnEliminarParte.setOnClickListener(v -> {
-            Toast.makeText(context, "Eliminar: " + parte, Toast.LENGTH_SHORT).show();
-            // Aquí irá la lógica para eliminar la parte de Firestore y actualizar la lista.
-            // Se podría notificar al ViewModel para que maneje esta acción.
+            Toast.makeText(v.getContext(), "Eliminar: " + parte, Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -57,20 +49,20 @@ public class PartesAdapter extends RecyclerView.Adapter<PartesAdapter.ParteViewH
         return partes.size();
     }
 
-    // Método para actualizar los datos del adaptador
     public void updateData(List<String> nuevasPartes) {
         this.partes = nuevasPartes;
-        notifyDataSetChanged(); // Notifica al RecyclerView que los datos han cambiado
+        notifyDataSetChanged();
     }
 
-    // Clase ViewHolder que contiene las vistas de la fila
     public static class ParteViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivPartIcon;
         TextView tvNombreParte;
         ImageButton btnModificarParte;
         ImageButton btnEliminarParte;
 
         public ParteViewHolder(@NonNull View itemView) {
             super(itemView);
+            ivPartIcon = itemView.findViewById(R.id.ivPartIcon);
             tvNombreParte = itemView.findViewById(R.id.tvNombreParte);
             btnModificarParte = itemView.findViewById(R.id.btnModificarParte);
             btnEliminarParte = itemView.findViewById(R.id.btnEliminarParte);

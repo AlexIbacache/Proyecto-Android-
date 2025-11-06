@@ -14,9 +14,8 @@ public class MaquinariaViewModel extends ViewModel {
 
     private final MaquinariaRepository repository;
 
-    // LiveData para la lista de maquinarias (pobla el Spinner)
-    private final MutableLiveData<List<Maquinaria>> _maquinarias = new MutableLiveData<>();
-    public final LiveData<List<Maquinaria>> maquinarias = _maquinarias;
+    // LiveData para la lista de maquinarias, obtenida directamente del repositorio
+    public final LiveData<List<Maquinaria>> maquinarias;
 
     // LiveData para las partes de la maquinaria seleccionada (actualiza el RecyclerView)
     private final MutableLiveData<List<String>> _partesSeleccionadas = new MutableLiveData<>();
@@ -28,35 +27,34 @@ public class MaquinariaViewModel extends ViewModel {
 
     public MaquinariaViewModel() {
         repository = new MaquinariaRepository();
-        cargarMaquinarias();
-    }
-
-    private void cargarMaquinarias() {
-        List<Maquinaria> data = repository.getMaquinarias();
-        _maquinarias.setValue(data);
+        // Se asigna directamente el LiveData del repositorio. La UI observará este LiveData.
+        maquinarias = repository.getMaquinariaList();
     }
 
     public void onMaquinaSeleccionada(int position) {
-        if (position > 0 && _maquinarias.getValue() != null) {
-            // Adjust position because the first item is a placeholder
-            Maquinaria maquina = _maquinarias.getValue().get(position - 1);
-            _partesSeleccionadas.setValue(maquina.getPartes());
+        List<Maquinaria> listaMaquinarias = maquinarias.getValue();
+        // La posición 0 es el hint "Seleccione una maquinaria"
+        if (position > 0 && listaMaquinarias != null && (position - 1) < listaMaquinarias.size()) {
+            Maquinaria maquina = listaMaquinarias.get(position - 1);
+            // Usar getPartesPrincipales() en lugar de getPartes()
+            _partesSeleccionadas.setValue(maquina.getPartesPrincipales() != null ? maquina.getPartesPrincipales() : new ArrayList<>());
             _botonesDeAccionVisibles.setValue(true);
         } else {
-            // No maquinaria selected or placeholder selected
+            // No hay maquinaria seleccionada o se seleccionó el placeholder
             _partesSeleccionadas.setValue(new ArrayList<>());
             _botonesDeAccionVisibles.setValue(false);
         }
     }
 
     public void eliminarMaquinaSeleccionada(int position) {
-        if (position > 0 && _maquinarias.getValue() != null) {
-            List<Maquinaria> listaActual = new ArrayList<>(_maquinarias.getValue());
-            // Adjust position to remove the correct item
-            listaActual.remove(position - 1);
-            repository.eliminarMaquinaria(listaActual.get(position - 2)); // Assuming repository needs the item to delete
-            _maquinarias.setValue(listaActual);
-            // After deletion, reset selection and hide buttons
+        List<Maquinaria> listaMaquinarias = maquinarias.getValue();
+         // La posición 0 es el hint "Seleccione una maquinaria"
+        if (position > 0 && listaMaquinarias != null && (position - 1) < listaMaquinarias.size()) {
+            Maquinaria maquinaAEliminar = listaMaquinarias.get(position - 1);
+            // Llamar al repositorio con el ID de la máquina
+            repository.eliminarMaquinaria(maquinaAEliminar.getId());
+            // La lista en la UI se actualizará automáticamente gracias al listener de Firestore que está en el repositorio.
+            // Solo necesitamos resetear la selección.
             onMaquinaSeleccionada(0);
         }
     }

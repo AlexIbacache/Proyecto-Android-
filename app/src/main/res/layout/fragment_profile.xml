@@ -143,6 +143,7 @@
         android:text="Cerrar Sesión"
         android:textColor="@color/design_default_color_error"
         app:icon="@drawable/ic_exit"
+        app:iconSize="24dp"
         app:iconTint="@color/design_default_color_error"
         app:layout_constraintBottom_toTopOf="@+id/tvVersion"
         app:layout_constraintEnd_toEndOf="parent"

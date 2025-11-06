@@ -4,19 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:padding="24dp"
-    tools:context=".ReparacionFragment">
+    android:background="@color/background_light"
+    tools:context=".ui.reparacion.ReparacionFragment">
 
-    <!-- Contenedor Superior -->
+    <TextView
+        android:id="@+id/tvTituloReparacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registrar Nueva Reparación"
+        android:textAppearance="?attr/textAppearanceHeadline5"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Card para selección de máquina y fecha -->
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/topContainer"
+        android:id="@+id/cardSeleccion"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#000000"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloReparacion"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -26,116 +38,79 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tvTitulo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="Partes de la Maquinaria"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF" />
-
             <Spinner
                 android:id="@+id/spinnerMaquinaria"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:minHeight="48dp"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark" />
+                android:layout_height="56dp"
+                android:background="@drawable/spinner_background" />
 
-            <EditText
-                android:id="@+id/etFecha"
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:focusable="false"
-                android:hint="Fecha"
-                android:textColorHint="#A0A0A0"
-                android:textColor="#FFFFFF"
-                android:inputType="date"
-                android:minHeight="48dp" />
+                android:hint="Fecha de la Reparación">
 
-            <EditText
-                android:id="@+id/etNotas"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etFecha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:focusable="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:gravity="top"
-                android:hint="Notas (opcional)"
-                android:textColorHint="#A0A0A0"
-                android:textColor="#FFFFFF"
-                android:maxLines="5"
-                android:minLines="2" />
+                android:hint="Notas de la reparación (opcional)">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNotas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:minLines="3"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Contenido Principal -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/contentContainer"
+    <TextView
+        android:id="@+id/tvTituloPartes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Añadir Repuestos por Parte"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@id/cardSeleccion"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Lista de Partes -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewPartesReparacion"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#FAFAFA"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
-        app:layout_constraintTop_toBottomOf="@+id/topContainer"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloPartes"
+        app:layout_constraintBottom_toTopOf="@+id/btnGuardarReparacion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_reparacion_parte"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGuardarReparacion"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Guardar Reparación"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <TableLayout
-            android:id="@+id/tablePartes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:stretchColumns="1"
-            android:padding="16dp">
-
-            <TableRow android:paddingBottom="8dp">
-                <TextView
-                    android:text="Motor"
-                    android:textSize="18sp"
-                    android:layout_weight="1" />
-                <ImageButton
-                    android:id="@+id/btnMotor"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Ver repuestos motor"
-                    android:src="@android:drawable/ic_input_add" />
-            </TableRow>
-
-            <TableRow android:paddingBottom="8dp">
-                <TextView
-                    android:text="Brazo"
-                    android:textSize="18sp"
-                    android:layout_weight="1"/>
-                <ImageButton
-                    android:id="@+id/btnBrazo"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Ver repuestos brazo"
-                    android:src="@android:drawable/ic_input_add" />
-            </TableRow>
-
-            <TableRow>
-                <TextView
-                    android:text="Bomba"
-                    android:textSize="18sp"
-                    android:layout_weight="1"/>
-                <ImageButton
-                    android:id="@+id/btnBomba"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Ver repuestos bomba"
-                    android:src="@android:drawable/ic_input_add" />
-            </TableRow>
-
-        </TableLayout>
-
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

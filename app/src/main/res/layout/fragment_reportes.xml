@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".ReportesFragment">
+    tools:context=".ui.reportes.ReportesFragment">
 
     <!-- Contenedor Superior -->
     <com.google.android.material.card.MaterialCardView
@@ -34,87 +34,17 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Contenido Principal -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/contentContainer"
+    <!-- Contenido Principal con RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReportes"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="24dp"
-        app:cardBackgroundColor="#FAFAFA"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="2dp"
         app:layout_constraintTop_toBottomOf="@+id/topContainer"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/fabExportarExcel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TableLayout
-                android:id="@+id/tableReportes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
-
-                <!-- Fila encabezado -->
-                <TableRow>
-                    <TextView android:padding="8dp" android:text="Fecha" android:textStyle="bold" />
-                    <TextView android:padding="8dp" android:text="Maquinaria" android:textStyle="bold" />
-                    <TextView android:padding="8dp" android:text="Parte" android:textStyle="bold" />
-                    <TextView android:padding="8dp" android:text="Repuesto" android:textStyle="bold" />
-                    <TextView android:padding="8dp" android:text="Cantidad" android:textStyle="bold" android:gravity="center"/>
-                    <TextView android:padding="8dp" android:text="Estado" android:textStyle="bold" android:gravity="center"/>
-                </TableRow>
-
-                <!-- Filas de ejemplo... -->
-                <TableRow>
-                    <TextView android:padding="8dp" android:text="24/09/2025" />
-                    <TextView android:padding="8dp" android:text="Excavadora" />
-                    <TextView android:padding="8dp" android:text="Motor" />
-                    <TextView android:padding="8dp" android:text="Filtro de aire" />
-                    <TextView android:padding="8dp" android:text="2" android:gravity="center"/>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:src="@android:drawable/checkbox_on_background"
-                        app:tint="@android:color/holo_green_dark"
-                        android:layout_gravity="center"/>
-                </TableRow>
-                <TableRow>
-                    <TextView android:padding="8dp" android:text="23/09/2025" />
-                    <TextView android:padding="8dp" android:text="Bulldozer" />
-                    <TextView android:padding="8dp" android:text="Brazo" />
-                    <TextView android:padding="8dp" android:text="Cilindro hidráulico" />
-                    <TextView android:padding="8dp" android:text="1" android:gravity="center"/>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:src="@android:drawable/ic_menu_close_clear_cancel"
-                        app:tint="@android:color/holo_red_dark"
-                        android:layout_gravity="center"/>
-                </TableRow>
-                <TableRow>
-                    <TextView android:padding="8dp" android:text="22/09/2025" />
-                    <TextView android:padding="8dp" android:text="Cargador LHD" />
-                    <TextView android:padding="8dp" android:text="Bomba" />
-                    <TextView android:padding="8dp" android:text="Manguera" />
-                    <TextView android:padding="8dp" android:text="4" android:gravity="center"/>
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:src="@android:drawable/checkbox_on_background"
-                        app:tint="@android:color/holo_green_dark"
-                        android:layout_gravity="center"/>
-                </TableRow>
-            </TableLayout>
-        </HorizontalScrollView>
-
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_reporte_maquinaria" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabExportarExcel"

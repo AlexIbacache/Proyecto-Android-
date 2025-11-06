@@ -21,7 +21,6 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 public class MaquinariaFormFragment extends Fragment {
 
@@ -32,14 +31,20 @@ public class MaquinariaFormFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_maquinaria_form, container, false);
+        // En onCreateView, solo inflamos la vista y la retornamos.
+        return inflater.inflate(R.layout.fragment_maquinaria_form, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Toda la inicialización de vistas y lógica de UI se mueve aquí.
+        // Este método se llama inmediatamente después de que onCreateView ha retornado una vista válida.
         setupViews(view);
         setupViewModel();
         setupObservers();
-        setupClickListeners();
-
-        return view;
+        setupClickListeners(view);
     }
 
     private void setupViews(View view) {
@@ -75,18 +80,18 @@ public class MaquinariaFormFragment extends Fragment {
         });
     }
 
-    private void setupClickListeners() {
+    // Pasamos la vista como parámetro para evitar usar getView(), que puede ser nulo.
+    private void setupClickListeners(View view) {
         etFechaIngreso.setOnClickListener(v -> showDatePickerDialog());
 
-        Button btnGuardarMaquinaria = getView().findViewById(R.id.btnGuardarMaquinaria);
+        Button btnGuardarMaquinaria = view.findViewById(R.id.btnGuardarMaquinaria);
         btnGuardarMaquinaria.setOnClickListener(v -> {
-            // Recolectar datos y pasarlos al ViewModel
             String nombre = etNombreMaquinaria.getText().toString();
-            // Aquí recolectarías las partes del containerPartes
-            viewModel.guardarMaquinaria(/* nombre, listaDePartes */);
+            // Aquí se recolectarían las partes del containerPartes en una futura implementación.
+            viewModel.guardarMaquinaria(nombre, new ArrayList<String>());
         });
 
-        FloatingActionButton fabAgregarParte = getView().findViewById(R.id.fabAgregarParte);
+        FloatingActionButton fabAgregarParte = view.findViewById(R.id.fabAgregarParte);
         fabAgregarParte.setOnClickListener(v -> {
             viewModel.agregarParte();
         });
@@ -110,7 +115,7 @@ public class MaquinariaFormFragment extends Fragment {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(
                 requireContext(),
-                (view, year, month, dayOfMonth) -> {
+                (v, year, month, dayOfMonth) -> {
                     viewModel.setFechaIngreso(year, month, dayOfMonth);
                 },
                 calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)

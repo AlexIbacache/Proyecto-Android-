@@ -1,18 +1,31 @@
 package com.example.proyectoandroid.model;
 
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentId;
+
 import java.util.List;
 
 // Plain Old Java Object (POJO) para representar una Maquinaria
 public class Maquinaria {
-    private String nombre;
-    private List<String> partes;
 
-    // Constructor vacío requerido para Firestore (aunque no lo usemos ahora, es buena práctica)
+    @DocumentId
+    private String id;
+    private String nombre;
+    private String numeroIdentificador;
+    private Timestamp fechaIngreso;
+    private String descripcion;
+    private List<String> partesPrincipales;
+    private boolean estado;
+
+    // Constructor vacío requerido para Firestore
     public Maquinaria() {}
 
-    public Maquinaria(String nombre, List<String> partes) {
-        this.nombre = nombre;
-        this.partes = partes;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -23,11 +36,43 @@ public class Maquinaria {
         this.nombre = nombre;
     }
 
-    public List<String> getPartes() {
-        return partes;
+    public String getNumeroIdentificador() {
+        return numeroIdentificador;
     }
 
-    public void setPartes(List<String> partes) {
-        this.partes = partes;
+    public void setNumeroIdentificador(String numeroIdentificador) {
+        this.numeroIdentificador = numeroIdentificador;
+    }
+
+    public Timestamp getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public void setFechaIngreso(Timestamp fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public List<String> getPartesPrincipales() {
+        return partesPrincipales;
+    }
+
+    public void setPartesPrincipales(List<String> partesPrincipales) {
+        this.partesPrincipales = partesPrincipales;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
     }
 }
