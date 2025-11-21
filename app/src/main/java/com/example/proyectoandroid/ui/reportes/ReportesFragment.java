@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectoandroid.R;
 import com.example.proyectoandroid.adapters.ReportesAdapter;
-import com.example.proyectoandroid.ui.reportes.ReparacionesDialogAdapter;
 import com.example.proyectoandroid.model.Maquinaria;
 import com.example.proyectoandroid.model.ParteReparada;
 import com.example.proyectoandroid.model.Reparacion;
@@ -86,9 +85,7 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
         });
 
         MaterialCheckBox checkboxSelectAll = view.findViewById(R.id.checkbox_select_all_operative);
-        checkboxSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            reportesViewModel.setSelectAllOperative(isChecked);
-        });
+        checkboxSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> reportesViewModel.setSelectAllOperative(isChecked));
 
         observeViewModel();
 
@@ -102,9 +99,8 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
             }
         });
 
-        reportesViewModel.getShowToastEvent().observe(getViewLifecycleOwner(), message -> {
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        });
+        reportesViewModel.getShowToastEvent().observe(getViewLifecycleOwner(),
+                message -> Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show());
 
         reportesViewModel.getStartLocalExportEvent().observe(getViewLifecycleOwner(), this::startLocalExportProcess);
     }
@@ -363,10 +359,11 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
 
         for (Reparacion reparacion : reparaciones) {
             String[] mainHeaders = {"ID Máquina", "Nombre Máquina", "Fecha de Reparación", "Notas"};
+            String fechaReparacionStr = (reparacion.getFecha() != null) ? new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(reparacion.getFecha().toDate()) : "";
             String[] mainData = {
                 maquina.getNumeroIdentificador(),
                 maquina.getNombre(),
-                new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(reparacion.getFecha().toDate()),
+                fechaReparacionStr,
                 reparacion.getNotas()
             };
 

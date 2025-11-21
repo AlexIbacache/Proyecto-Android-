@@ -1,6 +1,8 @@
 package com.example.proyectoandroid.ui.maquinaria;
 
+import android.net.Uri;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -56,8 +58,6 @@ public class MaquinariaFormViewModel extends ViewModel {
                     cal.setTime(maquinaria.getFechaIngreso().toDate());
                     setFechaIngreso(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
                 }
-            } else {
-                Log.w(TAG, "Maquinaria con ID " + maquinariaId + " no encontrada.");
             }
         });
     }
@@ -74,41 +74,39 @@ public class MaquinariaFormViewModel extends ViewModel {
 
     public void agregarParte() {
         int currentPartes = _partesCount.getValue() != null ? _partesCount.getValue() : 0;
-        Log.d(TAG, "agregarParte llamado. Partes actuales: " + currentPartes);
         if (currentPartes < MAX_PARTES) {
             _partesCount.setValue(currentPartes + 1);
             _addParteViewEvent.call();
         } else {
-            Log.w(TAG, "No se pueden agregar más partes. Límite alcanzado: " + MAX_PARTES);
             _showMaxPartesToastEvent.call();
         }
     }
 
     public void removerParte() {
         int currentPartes = _partesCount.getValue() != null ? _partesCount.getValue() : 0;
-        Log.d(TAG, "removerParte llamado. Partes actuales: " + currentPartes);
         if (currentPartes > 0) {
             _partesCount.setValue(currentPartes - 1);
         }
     }
 
-    public void guardarMaquinaria(String nombre, String numeroIdentificador, String descripcion, List<String> partes) {
-        Log.d(TAG, "guardarMaquinaria llamado para: " + nombre);
+    public void guardarMaquinaria(@Nullable String maquinariaId, String nombre, String numeroIdentificador, String descripcion, List<String> partes, @Nullable Uri photoUri) {
+        Log.d(TAG, "Iniciando proceso de guardado para: " + nombre);
         if (nombre == null || nombre.trim().isEmpty() || numeroIdentificador == null || numeroIdentificador.trim().isEmpty() || _fechaIngresoCalendar.getValue() == null) {
-            Log.e(TAG, "La validación para guardar la maquinaria falló. Faltan campos requeridos.");
+            Log.e(TAG, "Validación fallida. Faltan campos requeridos.");
             _saveMaquinariaEvent.setValue(false);
             return;
         }
 
-        Maquinaria maquinariaParaGuardar;
-        boolean isUpdating = _maquinariaCargada.getValue() != null;
-        Log.d(TAG, isUpdating ? "Actualizando maquinaria existente." : "Guardando nueva maquinaria.");
+        final boolean isUpdating = maquinariaId != null;
+        final String finalMaquinariaId = isUpdating ? maquinariaId : repository.getNewMaquinariaId();
 
+        Maquinaria maquinariaParaGuardar;
         if (isUpdating) {
             maquinariaParaGuardar = _maquinariaCargada.getValue();
         } else {
             maquinariaParaGuardar = new Maquinaria();
-            maquinariaParaGuardar.setEstado(false); // Estado por defecto para nuevas máquinas
+            maquinariaParaGuardar.setDocumentId(finalMaquinariaId);
+            maquinariaParaGuardar.setEstado(false);
         }
 
         maquinariaParaGuardar.setNombre(nombre);
@@ -117,16 +115,33 @@ public class MaquinariaFormViewModel extends ViewModel {
         maquinariaParaGuardar.setPartesPrincipales(partes);
         maquinariaParaGuardar.setFechaIngreso(new Timestamp(_fechaIngresoCalendar.getValue().getTime()));
 
-        if (isUpdating) {
-            repository.actualizarMaquinaria(maquinariaParaGuardar, success -> {
-                Log.d(TAG, "Resultado de actualizarMaquinaria: " + success);
-                _saveMaquinariaEvent.postValue(success);
+        if (photoUri != null) {
+            repository.subirFotoMaquinaria(finalMaquinariaId, photoUri, new MaquinariaRepository.UploadImageCallback() {
+                @Override
+                public void onImageUploaded(String imageUrl) {
+                    maquinariaParaGuardar.setImagenUrl(imageUrl);
+                    saveOrUpdate(maquinariaParaGuardar, isUpdating);
+                }
+
+                @Override
+                public void onUploadFailed(Exception e) {
+                    Log.e(TAG, "Error al subir la imagen", e);
+                    _saveMaquinariaEvent.setValue(false);
+                }
             });
         } else {
-            repository.guardarMaquinaria(maquinariaParaGuardar, success -> {
-                Log.d(TAG, "Resultado de guardarMaquinaria: " + success);
-                _saveMaquinariaEvent.postValue(success);
-            });
+            if (isUpdating) {
+                maquinariaParaGuardar.setImagenUrl(_maquinariaCargada.getValue().getImagenUrl());
+            }
+            saveOrUpdate(maquinariaParaGuardar, isUpdating);
+        }
+    }
+
+    private void saveOrUpdate(Maquinaria maquinaria, boolean isUpdating) {
+        if (isUpdating) {
+            repository.actualizarMaquinaria(maquinaria, success -> _saveMaquinariaEvent.postValue(success));
+        } else {
+            repository.guardarMaquinaria(maquinaria, success -> _saveMaquinariaEvent.postValue(success));
         }
     }
 }

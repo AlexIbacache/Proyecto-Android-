@@ -17,6 +17,7 @@ public class Maquinaria {
     private List<String> partesPrincipales;
     private boolean estado;
     private boolean isSelected;
+    private String imagenUrl;
 
     // Constructor vacío requerido para Firestore
     public Maquinaria() {}
@@ -89,5 +90,13 @@ public class Maquinaria {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 }

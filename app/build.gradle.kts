@@ -37,6 +37,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-functions")
+    implementation("com.google.firebase:firebase-storage")
 
     // Google Services
     implementation("com.google.android.gms:play-services-auth:20.7.0")
@@ -53,6 +54,9 @@ dependencies {
 
     // Shimmer Effect
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+    // Glide para cargar imágenes desde una URL
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // Otras dependencias
     implementation("org.apache.poi:poi:5.4.1")
