@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">ProyectoAndroid</string>
+    <string name="app_name">SparePartsM</string>
     <string name="default_web_client_id">TU_CLIENT_ID.apps.googleusercontent.com</string>
+    <string name="delete_repair">Eliminar reparación</string>
     <string-array name="maquinarias_array">
         <item>Selecciona una maquinaria...</item>
         <item>Excavadora Caterpillar</item>

@@ -19,67 +19,101 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Número Identificador -->
-        <TextView
-            android:id="@+id/tvNumeroIdentificador"
+        <!-- CheckBox para selección -->
+        <CheckBox
+            android:id="@+id/checkbox_maquinaria_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="?android:attr/textColorSecondary"
+            android:enabled="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="EQ: 163" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <!-- Nombre de la Máquina -->
-        <TextView
-            android:id="@+id/tvNombreMaquina"
+        <!-- Contenedor para el resto de la información -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/info_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceHeadline6"
-            android:textColor="?android:attr/textColorPrimary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvNumeroIdentificador"
-            app:layout_constraintEnd_toStartOf="@+id/chipEstado"
-            android:layout_marginEnd="16dp"
-            tools:text="Alpha 30 Excavadora Ultra" />
-
-        <!-- Icono de Calendario -->
-        <ImageView
-            android:id="@+id/ivCalendarIcon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginTop="8dp"
-            android:src="@android:drawable/ic_menu_my_calendar"
-            app:tint="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvNombreMaquina" />
-
-        <!-- Fecha de Ingreso -->
-        <TextView
-            android:id="@+id/tvFechaIngreso"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toEndOf="@id/ivCalendarIcon"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toEndOf="@id/checkbox_maquinaria_select"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/ivCalendarIcon"
-            app:layout_constraintTop_toTopOf="@id/ivCalendarIcon"
-            tools:text="04 de Agosto, 2025" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Chip de Estado -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipEstado"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:chipCornerRadius="6dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Operativa"
-            tools:chipBackgroundColor="@android:color/holo_green_light"
-            tools:textColor="@android:color/white"/>
+            <ImageButton
+                android:id="@+id/btnEliminarMaquinaria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Eliminar Maquinaria"
+                android:src="@android:drawable/ic_menu_delete"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@android:color/holo_red_dark" />
+
+            <!-- Número Identificador -->
+            <TextView
+                android:id="@+id/tvNumeroIdentificador"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="EQ: 163" />
+
+            <!-- Nombre de la Máquina -->
+            <TextView
+                android:id="@+id/tvNombreMaquina"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textColor="?android:attr/textColorPrimary"
+                app:layout_constraintEnd_toStartOf="@+id/chipEstado"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvNumeroIdentificador"
+                tools:text="Alpha 30 Excavadora Ultra" />
+
+            <!-- Icono de Calendario -->
+            <ImageView
+                android:id="@+id/ivCalendarIcon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="8dp"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvNombreMaquina"
+                app:tint="?android:attr/textColorSecondary" />
+
+            <!-- Fecha de Ingreso -->
+            <TextView
+                android:id="@+id/tvFechaIngreso"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:textColor="?android:attr/textColorSecondary"
+                app:layout_constraintBottom_toBottomOf="@+id/ivCalendarIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/ivCalendarIcon"
+                app:layout_constraintTop_toTopOf="@id/ivCalendarIcon"
+                tools:text="04 de Agosto, 2025" />
+
+            <!-- Chip de Estado -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:chipCornerRadius="6dp"
+                app:layout_constraintEnd_toStartOf="@+id/btnEliminarMaquinaria"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:chipBackgroundColor="@android:color/holo_green_light"
+                tools:text="Operativa"
+                tools:textColor="@android:color/white" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

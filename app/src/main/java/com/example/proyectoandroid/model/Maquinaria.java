@@ -16,9 +16,16 @@ public class Maquinaria {
     private String descripcion;
     private List<String> partesPrincipales;
     private boolean estado;
+    private boolean isSelected;
 
     // Constructor vacío requerido para Firestore
     public Maquinaria() {}
+
+    // Constructor para crear un placeholder en el Spinner
+    public Maquinaria(String documentId, String nombre) {
+        this.documentId = documentId;
+        this.nombre = nombre;
+    }
 
     public String getDocumentId() {
         return documentId;
@@ -74,5 +81,13 @@ public class Maquinaria {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

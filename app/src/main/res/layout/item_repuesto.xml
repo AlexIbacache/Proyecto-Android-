@@ -1,66 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="4dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginEnd="4dp"
-    android:layout_marginBottom="4dp"
-    app:cardCornerRadius="8dp">
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvNombreRepuestoItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBody1"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btnEliminarRepuesto"
-            tools:text="Filtro de Aceite" />
-
-        <TextView
-            android:id="@+id/tvCodigoRepuestoItem"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="?android:attr/textColorSecondary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvNombreRepuestoItem"
-            app:layout_constraintEnd_toStartOf="@+id/tvCantidadRepuestoItem"
-            tools:text="Código: 12345-ABC" />
-
-        <TextView
-            android:id="@+id/tvCantidadRepuestoItem"
+            android:id="@+id/tvNombreRepuesto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textStyle="italic"
-            app:layout_constraintBaseline_toBaselineOf="@+id/tvCodigoRepuestoItem"
-            app:layout_constraintEnd_toStartOf="@+id/btnEliminarRepuesto"
-            app:layout_constraintTop_toBottomOf="@+id/tvNombreRepuestoItem"
-            tools:text="Cant: 2" />
+            android:textStyle="bold"
+            android:text="Nombre del Repuesto"/>
 
-        <ImageButton
-            android:id="@+id/btnEliminarRepuesto"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_delete"
-            app:tint="@color/design_default_color_error"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:contentDescription="Eliminar repuesto" />
+        <TextView
+            android:id="@+id/tvCodigoRepuesto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Código: ABC-123"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tvCantidadRepuesto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cantidad: 1"/>
 
-</com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnEliminarRepuestoIndividual"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@android:color/holo_red_dark"
+        android:contentDescription="Eliminar Repuesto" />
+
+</LinearLayout>

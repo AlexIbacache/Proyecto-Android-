@@ -5,12 +5,17 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.proyectoandroid.model.Maquinaria;
+import com.example.proyectoandroid.model.ParteReparada;
 import com.example.proyectoandroid.model.Reparacion;
+import com.example.proyectoandroid.model.Repuesto;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -240,5 +245,65 @@ public class MaquinariaRepository {
         } else {
             Log.w(TAG, "eliminarMaquinaria: El usuario o el ID de la maquinaria es nulo");
         }
+    }
+
+    public Task<Void> deleteReparacion(String userId, String maquinaId, String reparacionId) {
+        Log.d(TAG, "deleteReparacion llamado para userId: " + userId + ", maquinaId: " + maquinaId + ", reparacionId: " + reparacionId);
+        return db.collection("users").document(userId)
+                .collection("maquinaria").document(maquinaId)
+                .collection("reparaciones").document(reparacionId)
+                .delete();
+    }
+
+    public void eliminarRepuestoDeReparacion(String maquinaId, String reparacionId, String parteNombre, Repuesto repuesto, FirestoreCallback callback) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            callback.onComplete(false);
+            return;
+        }
+
+        DocumentReference reparacionRef = db.collection("users").document(currentUser.getUid())
+                .collection("maquinaria").document(maquinaId)
+                .collection("reparaciones").document(reparacionId);
+
+        db.runTransaction(transaction -> {
+            Reparacion reparacion = transaction.get(reparacionRef).toObject(Reparacion.class);
+            if (reparacion != null && reparacion.getPartesReparadas() != null) {
+                for (ParteReparada parte : reparacion.getPartesReparadas()) {
+                    if (parte.getNombreParte().equals(parteNombre)) {
+                        if (parte.getRepuestos() != null) {
+                            parte.getRepuestos().remove(repuesto);
+                            break; 
+                        }
+                    }
+                }
+                transaction.set(reparacionRef, reparacion);
+            }
+            return null;
+        }).addOnSuccessListener(aVoid -> callback.onComplete(true))
+          .addOnFailureListener(e -> callback.onComplete(false));
+    }
+
+    public void eliminarTodosLosReportesDeMaquina(String maquinariaId, FirestoreCallback callback) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            callback.onComplete(false);
+            return;
+        }
+
+        db.collection("users").document(currentUser.getUid())
+                .collection("maquinaria").document(maquinariaId)
+                .collection("reparaciones")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    WriteBatch batch = db.batch();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        batch.delete(doc.getReference());
+                    }
+                    batch.commit()
+                        .addOnSuccessListener(aVoid -> callback.onComplete(true))
+                        .addOnFailureListener(e -> callback.onComplete(false));
+                })
+                .addOnFailureListener(e -> callback.onComplete(false));
     }
 }

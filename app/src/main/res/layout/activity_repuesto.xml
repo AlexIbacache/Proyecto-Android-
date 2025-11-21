@@ -17,26 +17,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="Repuestos para: Motor" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewRepuestos"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloRepuesto"
-        app:layout_constraintBottom_toTopOf="@+id/cardAnadirRepuesto"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:listitem="@layout/item_repuesto"/>
-
+    <!-- FORMULARIO ARRIBA -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardAnadirRepuesto"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloRepuesto"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -102,13 +91,26 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGuardarRepuestos"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"                
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Guardar Cambios y Volver"/>
+                android:text="Guardar Cambios y Volver" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- LISTA ABAJO -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewRepuestos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/cardAnadirRepuesto"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_repuesto"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

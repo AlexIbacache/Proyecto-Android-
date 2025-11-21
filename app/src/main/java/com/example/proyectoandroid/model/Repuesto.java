@@ -2,6 +2,7 @@ package com.example.proyectoandroid.model;
 
 import com.google.firebase.firestore.DocumentId;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Repuesto implements Serializable {
 
@@ -50,5 +51,20 @@ public class Repuesto implements Serializable {
 
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Repuesto repuesto = (Repuesto) o;
+        return Objects.equals(documentId, repuesto.documentId) &&
+               Objects.equals(nombre, repuesto.nombre) &&
+               Objects.equals(codigo, repuesto.codigo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(documentId, nombre, codigo);
     }
 }
