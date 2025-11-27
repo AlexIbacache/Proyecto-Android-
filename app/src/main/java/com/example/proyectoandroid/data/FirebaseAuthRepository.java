@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.proyectoandroid.util.Result;
+import com.example.proyectoandroid.util.UserActionLogger;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,6 +30,7 @@ public class FirebaseAuthRepository implements AuthRepository {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "Inicio de sesión exitoso para el correo: " + email);
+                        UserActionLogger.logLogin(email);
                         liveData.setValue(new Result.Success<>(firebaseAuth.getCurrentUser()));
                     } else {
                         Log.e(TAG, "Falló el inicio de sesión para el correo: " + email, task.getException());
@@ -47,7 +49,11 @@ public class FirebaseAuthRepository implements AuthRepository {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Log.d(TAG, "Inicio de sesión con Google exitoso");
-                        liveData.setValue(new Result.Success<>(firebaseAuth.getCurrentUser()));
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
+                        if (user != null && user.getEmail() != null) {
+                            UserActionLogger.logLogin(user.getEmail());
+                        }
+                        liveData.setValue(new Result.Success<>(user));
                     } else {
                         Log.e(TAG, "Falló el inicio de sesión con Google", task.getException());
                         liveData.setValue(new Result.Error<>(task.getException()));
@@ -72,20 +78,26 @@ public class FirebaseAuthRepository implements AuthRepository {
                             user.updateProfile(profileUpdates)
                                     .addOnCompleteListener(profileTask -> {
                                         if (profileTask.isSuccessful()) {
-                                            Log.d(TAG, "Actualización de perfil exitosa. Guardando usuario en Firestore.");
+                                            Log.d(TAG,
+                                                    "Actualización de perfil exitosa. Guardando usuario en Firestore.");
                                             String userId = user.getUid();
                                             Map<String, Object> userData = new HashMap<>();
                                             userData.put("email", user.getEmail());
                                             userData.put("nombre", name);
+                                            userData.put("role", "user"); // Por defecto: usuario normal
 
                                             db.collection("users").document(userId)
                                                     .set(userData)
                                                     .addOnSuccessListener(aVoid -> {
-                                                        Log.d(TAG, "Datos del usuario guardados en Firestore exitosamente.");
+                                                        Log.d(TAG,
+                                                                "Datos del usuario guardados en Firestore exitosamente.");
+                                                        UserActionLogger.logRegister(email, name);
                                                         liveData.setValue(new Result.Success<>(user));
                                                     })
                                                     .addOnFailureListener(e -> {
-                                                        Log.e(TAG, "Error al guardar los datos del usuario en Firestore", e);
+                                                        Log.e(TAG,
+                                                                "Error al guardar los datos del usuario en Firestore",
+                                                                e);
                                                         liveData.setValue(new Result.Error<>(e));
                                                     });
                                         } else {
@@ -109,6 +121,7 @@ public class FirebaseAuthRepository implements AuthRepository {
     @Override
     public void logout() {
         Log.d(TAG, "Cerrando sesión del usuario");
+        UserActionLogger.logLogout();
         firebaseAuth.signOut();
     }
 }

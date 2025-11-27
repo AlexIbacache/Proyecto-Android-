@@ -9,6 +9,7 @@ import com.example.proyectoandroid.model.Maquinaria;
 import com.example.proyectoandroid.model.ParteReparada;
 import com.example.proyectoandroid.model.Reparacion;
 import com.example.proyectoandroid.model.Repuesto;
+import com.example.proyectoandroid.util.UserActionLogger;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -38,6 +39,7 @@ public class MaquinariaRepository {
 
     public interface UploadImageCallback {
         void onImageUploaded(String imageUrl);
+
         void onUploadFailed(Exception e);
     }
 
@@ -56,19 +58,19 @@ public class MaquinariaRepository {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             db.collection("users").document(currentUser.getUid()).collection("maquinaria")
-                .addSnapshotListener((snapshots, e) -> {
-                    if (e != null) {
-                        maquinariaLiveData.postValue(null);
-                        return;
-                    }
-                    List<Maquinaria> maquinarias = new ArrayList<>();
-                    if (snapshots != null) {
-                        for (QueryDocumentSnapshot doc : snapshots) {
-                            maquinarias.add(doc.toObject(Maquinaria.class));
+                    .addSnapshotListener((snapshots, e) -> {
+                        if (e != null) {
+                            maquinariaLiveData.postValue(null);
+                            return;
                         }
-                    }
-                    maquinariaLiveData.postValue(maquinarias);
-                });
+                        List<Maquinaria> maquinarias = new ArrayList<>();
+                        if (snapshots != null) {
+                            for (QueryDocumentSnapshot doc : snapshots) {
+                                maquinarias.add(doc.toObject(Maquinaria.class));
+                            }
+                        }
+                        maquinariaLiveData.postValue(maquinarias);
+                    });
         }
         return maquinariaLiveData;
     }
@@ -78,15 +80,15 @@ public class MaquinariaRepository {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null && maquinariaId != null) {
             db.collection("users").document(currentUser.getUid()).collection("maquinaria").document(maquinariaId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        maquinariaLiveData.postValue(documentSnapshot.toObject(Maquinaria.class));
-                    } else {
-                        maquinariaLiveData.postValue(null);
-                    }
-                })
-                .addOnFailureListener(e -> maquinariaLiveData.postValue(null));
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            maquinariaLiveData.postValue(documentSnapshot.toObject(Maquinaria.class));
+                        } else {
+                            maquinariaLiveData.postValue(null);
+                        }
+                    })
+                    .addOnFailureListener(e -> maquinariaLiveData.postValue(null));
         }
         return maquinariaLiveData;
     }
@@ -97,7 +99,11 @@ public class MaquinariaRepository {
             db.collection("users").document(currentUser.getUid())
                     .collection("maquinaria").document(maquinaria.getDocumentId())
                     .set(maquinaria)
-                    .addOnSuccessListener(aVoid -> callback.onComplete(true))
+                    .addOnSuccessListener(aVoid -> {
+                        UserActionLogger.logCreateMaquinaria(maquinaria.getDocumentId(),
+                                maquinaria.getNombre() != null ? maquinaria.getNombre() : "Sin nombre");
+                        callback.onComplete(true);
+                    })
                     .addOnFailureListener(e -> callback.onComplete(false));
         } else {
             callback.onComplete(false);
@@ -108,10 +114,14 @@ public class MaquinariaRepository {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null && maquinaria.getDocumentId() != null) {
             db.collection("users").document(currentUser.getUid())
-              .collection("maquinaria").document(maquinaria.getDocumentId())
-              .set(maquinaria, SetOptions.merge())
-              .addOnSuccessListener(aVoid -> callback.onComplete(true))
-              .addOnFailureListener(e -> callback.onComplete(false));
+                    .collection("maquinaria").document(maquinaria.getDocumentId())
+                    .set(maquinaria, SetOptions.merge())
+                    .addOnSuccessListener(aVoid -> {
+                        UserActionLogger.logUpdateMaquinaria(maquinaria.getDocumentId(),
+                                maquinaria.getNombre() != null ? maquinaria.getNombre() : "Sin nombre");
+                        callback.onComplete(true);
+                    })
+                    .addOnFailureListener(e -> callback.onComplete(false));
         } else {
             callback.onComplete(false);
         }
@@ -124,11 +134,13 @@ public class MaquinariaRepository {
             return;
         }
 
-        StorageReference storageRef = storage.getReference().child("maquinaria_imagenes/" + currentUser.getUid() + "/" + maquinariaId + ".jpg");
+        StorageReference storageRef = storage.getReference()
+                .child("maquinaria_imagenes/" + currentUser.getUid() + "/" + maquinariaId + ".jpg");
 
         UploadTask uploadTask = storageRef.putFile(photoUri);
         uploadTask.addOnFailureListener(callback::onUploadFailed).addOnSuccessListener(taskSnapshot -> {
             storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                UserActionLogger.logUploadImage(maquinariaId, "Imagen de maquinaria");
                 callback.onImageUploaded(uri.toString());
             }).addOnFailureListener(callback::onUploadFailed);
         });
@@ -161,21 +173,21 @@ public class MaquinariaRepository {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             db.collection("users").document(currentUser.getUid())
-                .collection("maquinaria").document(maquinariaId)
-                .collection("reparaciones")
-                .addSnapshotListener((snapshots, e) -> {
-                    if (e != null) {
-                        reparacionesLiveData.postValue(null);
-                        return;
-                    }
-                    List<Reparacion> reparaciones = new ArrayList<>();
-                    if (snapshots != null) {
-                        for (QueryDocumentSnapshot doc : snapshots) {
-                            reparaciones.add(doc.toObject(Reparacion.class));
+                    .collection("maquinaria").document(maquinariaId)
+                    .collection("reparaciones")
+                    .addSnapshotListener((snapshots, e) -> {
+                        if (e != null) {
+                            reparacionesLiveData.postValue(null);
+                            return;
                         }
-                    }
-                    reparacionesLiveData.postValue(reparaciones);
-                });
+                        List<Reparacion> reparaciones = new ArrayList<>();
+                        if (snapshots != null) {
+                            for (QueryDocumentSnapshot doc : snapshots) {
+                                reparaciones.add(doc.toObject(Reparacion.class));
+                            }
+                        }
+                        reparacionesLiveData.postValue(reparaciones);
+                    });
         }
         return reparacionesLiveData;
     }
@@ -187,7 +199,11 @@ public class MaquinariaRepository {
                     .collection("maquinaria").document(maquinariaId)
                     .collection("reparaciones")
                     .add(reparacion)
-                    .addOnSuccessListener(documentReference -> callback.onComplete(true))
+                    .addOnSuccessListener(documentReference -> {
+                        UserActionLogger.logCreateReparacion(documentReference.getId(),
+                                "Maquinaria ID: " + maquinariaId);
+                        callback.onComplete(true);
+                    })
                     .addOnFailureListener(e -> callback.onComplete(false));
         }
     }
@@ -199,7 +215,11 @@ public class MaquinariaRepository {
                     .collection("maquinaria").document(maquinariaId)
                     .collection("reparaciones").document(reparacion.getDocumentId())
                     .set(reparacion)
-                    .addOnSuccessListener(aVoid -> callback.onComplete(true))
+                    .addOnSuccessListener(aVoid -> {
+                        UserActionLogger.logUpdateReparacion(reparacion.getDocumentId(),
+                                "Maquinaria ID: " + maquinariaId);
+                        callback.onComplete(true);
+                    })
                     .addOnFailureListener(e -> callback.onComplete(false));
         }
     }
@@ -207,20 +227,23 @@ public class MaquinariaRepository {
     public void eliminarMaquinaria(String maquinariaId) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null && maquinariaId != null) {
+            UserActionLogger.logDeleteMaquinaria(maquinariaId, "Maquinaria ID: " + maquinariaId);
             db.collection("users").document(currentUser.getUid())
-              .collection("maquinaria").document(maquinariaId)
-              .delete();
+                    .collection("maquinaria").document(maquinariaId)
+                    .delete();
         }
     }
 
     public Task<Void> deleteReparacion(String userId, String maquinaId, String reparacionId) {
+        UserActionLogger.logDeleteReparacion(reparacionId, "Maquinaria ID: " + maquinaId);
         return db.collection("users").document(userId)
                 .collection("maquinaria").document(maquinaId)
                 .collection("reparaciones").document(reparacionId)
                 .delete();
     }
 
-    public void eliminarRepuestoDeReparacion(String maquinaId, String reparacionId, String parteNombre, Repuesto repuesto, FirestoreCallback callback) {
+    public void eliminarRepuestoDeReparacion(String maquinaId, String reparacionId, String parteNombre,
+            Repuesto repuesto, FirestoreCallback callback) {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             callback.onComplete(false);
@@ -238,7 +261,7 @@ public class MaquinariaRepository {
                     if (parte.getNombreParte().equals(parteNombre)) {
                         if (parte.getRepuestos() != null) {
                             parte.getRepuestos().remove(repuesto);
-                            break; 
+                            break;
                         }
                     }
                 }
@@ -246,7 +269,7 @@ public class MaquinariaRepository {
             }
             return null;
         }).addOnSuccessListener(aVoid -> callback.onComplete(true))
-          .addOnFailureListener(e -> callback.onComplete(false));
+                .addOnFailureListener(e -> callback.onComplete(false));
     }
 
     public void eliminarTodosLosReportesDeMaquina(String maquinariaId, FirestoreCallback callback) {
@@ -266,8 +289,8 @@ public class MaquinariaRepository {
                         batch.delete(doc.getReference());
                     }
                     batch.commit()
-                        .addOnSuccessListener(aVoid -> callback.onComplete(true))
-                        .addOnFailureListener(e -> callback.onComplete(false));
+                            .addOnSuccessListener(aVoid -> callback.onComplete(true))
+                            .addOnFailureListener(e -> callback.onComplete(false));
                 })
                 .addOnFailureListener(e -> callback.onComplete(false));
     }
