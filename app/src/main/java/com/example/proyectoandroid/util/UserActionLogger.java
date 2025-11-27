@@ -34,9 +34,9 @@ public class UserActionLogger {
     public static final String ENTITY_REPARACION = "REPARACION";
     public static final String ENTITY_REPUESTO = "REPUESTO";
     public static final String ENTITY_IMAGE = "IMAGE";
+    public static final String ENTITY_REPORTE = "REPORTE";
     public static final String ENTITY_SCREEN = "SCREEN";
 
-    // Constructor privado para evitar instanciación
     private UserActionLogger() {
     }
 
@@ -205,5 +205,10 @@ public class UserActionLogger {
     // Método para subida de imágenes
     public static void logUploadImage(String maquinariaId, String maquinariaNombre) {
         logUpload(ENTITY_IMAGE, maquinariaId, "Subió imagen para maquinaria: " + maquinariaNombre);
+    }
+
+    // Métodos específicos para Reportes
+    public static void logCreateReporte(String nombreArchivo) {
+        logCreate(ENTITY_REPORTE, "EXPORT_" + System.currentTimeMillis(), "Generó reporte: " + nombreArchivo);
     }
 }

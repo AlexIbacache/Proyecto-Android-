@@ -373,4 +373,35 @@ public class LoggerRepository {
 
         return taskSource.getTask();
     }
+
+    /**
+     * Obtiene el conteo de logs de creación de una entidad específica para un
+     * usuario.
+     * Útil para estadísticas de perfil.
+     *
+     * @param userId     ID del usuario
+     * @param entityType Tipo de entidad (MAQUINARIA, REPARACION, REPORTE)
+     * @param listener   Callback con el conteo
+     */
+    public void getUserEntityCount(String userId, String entityType, OnCountListener listener) {
+        if (userId == null || entityType == null) {
+            listener.onCount(0);
+            return;
+        }
+
+        db.collection(COLLECTION_NAME)
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("actionType", "CREATE")
+                .whereEqualTo("entityType", entityType)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    int count = querySnapshot.size();
+                    Log.d(TAG, "Conteo para " + entityType + ": " + count);
+                    listener.onCount(count);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error al contar logs de usuario", e);
+                    listener.onCount(0);
+                });
+    }
 }

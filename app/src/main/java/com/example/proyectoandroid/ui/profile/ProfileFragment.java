@@ -41,8 +41,8 @@ public class ProfileFragment extends Fragment {
     private ProfileViewModel profileViewModel;
     private FusedLocationProviderClient fusedLocationClient;
 
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     // Correcto: El fragmento se encarga de llamar a su propio método de UI/HW
                     getDeviceLocation();
@@ -51,17 +51,41 @@ public class ProfileFragment extends Fragment {
                 }
             });
 
+    // Stats Views
+    private TextView tvCountMaquinaria, tvCountReparacionesAbiertas, tvCountReparacionesCerradas, tvCountReportes;
+    private android.widget.ProgressBar progressMaquinaria, progressReparacionesAbiertas, progressReparacionesCerradas,
+            progressReportes;
+    private com.example.proyectoandroid.data.LoggerRepository loggerRepository;
+    private com.example.proyectoandroid.data.MaquinariaRepository maquinariaRepository;
+
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         profileViewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
+        loggerRepository = new com.example.proyectoandroid.data.LoggerRepository();
+        maquinariaRepository = new com.example.proyectoandroid.data.MaquinariaRepository();
 
+        // Initialize Views
         tvNombre = view.findViewById(R.id.tvNombre);
         tvEmail = view.findViewById(R.id.tvEmail);
         tvUbicacion = view.findViewById(R.id.tvUbicacion);
         Button btnCerrarS = view.findViewById(R.id.btnCerrarS);
+
+        // Initialize Stats Views
+        tvCountMaquinaria = view.findViewById(R.id.tvCountMaquinaria);
+        progressMaquinaria = view.findViewById(R.id.progressMaquinaria);
+
+        tvCountReparacionesAbiertas = view.findViewById(R.id.tvCountReparacionesAbiertas);
+        progressReparacionesAbiertas = view.findViewById(R.id.progressReparacionesAbiertas);
+
+        tvCountReparacionesCerradas = view.findViewById(R.id.tvCountReparacionesCerradas);
+        progressReparacionesCerradas = view.findViewById(R.id.progressReparacionesCerradas);
+
+        tvCountReportes = view.findViewById(R.id.tvCountReportes);
+        progressReportes = view.findViewById(R.id.progressReportes);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
@@ -89,13 +113,68 @@ public class ProfileFragment extends Fragment {
         // Iniciar la carga de datos
         profileViewModel.loadUserData();
         verificarPermisoYObtenerUbicacion();
+        loadUserStats();
 
         return view;
     }
 
+    private void loadUserStats() {
+        com.google.firebase.auth.FirebaseUser user = com.google.firebase.auth.FirebaseAuth.getInstance()
+                .getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+
+            // Cargar estadísticas de Maquinaria (Logs)
+            loggerRepository.getUserEntityCount(userId,
+                    com.example.proyectoandroid.util.UserActionLogger.ENTITY_MAQUINARIA, count -> {
+                        if (tvCountMaquinaria != null) {
+                            animateProgress(progressMaquinaria, tvCountMaquinaria, count, 50);
+                        }
+                    });
+
+            // Cargar estadísticas de Reparaciones (Datos Reales: Abiertas vs Cerradas)
+            maquinariaRepository.getReparacionStats(userId, (abiertas, cerradas) -> {
+                if (tvCountReparacionesAbiertas != null) {
+                    animateProgress(progressReparacionesAbiertas, tvCountReparacionesAbiertas, abiertas, 20);
+                }
+                if (tvCountReparacionesCerradas != null) {
+                    animateProgress(progressReparacionesCerradas, tvCountReparacionesCerradas, cerradas, 50);
+                }
+            });
+
+            // Cargar estadísticas de Reportes (Logs)
+            loggerRepository.getUserEntityCount(userId,
+                    com.example.proyectoandroid.util.UserActionLogger.ENTITY_REPORTE, count -> {
+                        if (tvCountReportes != null) {
+                            animateProgress(progressReportes, tvCountReportes, count, 50);
+                        }
+                    });
+        }
+    }
+
+    private void animateProgress(android.widget.ProgressBar progressBar, TextView textView, int value, int max) {
+        if (progressBar == null || textView == null)
+            return;
+
+        progressBar.setMax(max);
+
+        // Animar ProgressBar
+        android.animation.ObjectAnimator animation = android.animation.ObjectAnimator.ofInt(progressBar, "progress", 0,
+                value);
+        animation.setDuration(1000); // 1 segundo
+        animation.setInterpolator(new android.view.animation.DecelerateInterpolator());
+        animation.start();
+
+        // Animar TextView (Contador)
+        android.animation.ValueAnimator animator = android.animation.ValueAnimator.ofInt(0, value);
+        animator.setDuration(1000);
+        animator.addUpdateListener(animation1 -> textView.setText(animation1.getAnimatedValue().toString()));
+        animator.start();
+    }
+
     private void verificarPermisoYObtenerUbicacion() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // Correcto: El fragmento se encarga de llamar a su propio método de UI/HW
             getDeviceLocation();
         } else {

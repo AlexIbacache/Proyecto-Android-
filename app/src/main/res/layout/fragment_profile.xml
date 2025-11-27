@@ -119,7 +119,7 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Tarjeta de Estadísticas (Placeholder) -->
+    <!-- Tarjeta de Estadísticas -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/statsCard"
         android:layout_width="0dp"
@@ -144,14 +144,151 @@
                 android:text="Actividad Reciente"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="?android:attr/textColorPrimary"/>
+                android:textColor="?android:attr/textColorPrimary"
+                android:layout_marginBottom="16dp"/>
 
-            <TextView
+            <!-- Maquinaria Stats -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Próximamente: Aquí se mostrarán estadísticas de uso y actividad."
-                android:textColor="?android:attr/textColorSecondary"/>
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Maquinaria Creada"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:id="@+id/tvCountMaquinaria"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textStyle="bold"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progressMaquinaria"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:max="50"
+                    android:progress="0"
+                    android:progressTint="#4CAF50"/>
+            </LinearLayout>
+
+            <!-- Reparaciones Stats (Abiertas) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Reparaciones en Curso"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:id="@+id/tvCountReparacionesAbiertas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textStyle="bold"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progressReparacionesAbiertas"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:max="20"
+                    android:progress="0"
+                    android:progressTint="#2196F3"/>
+            </LinearLayout>
+
+            <!-- Reparaciones Stats (Cerradas) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="12dp">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Reparaciones Finalizadas"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:id="@+id/tvCountReparacionesCerradas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textStyle="bold"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progressReparacionesCerradas"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:max="50"
+                    android:progress="0"
+                    android:progressTint="#4CAF50"/>
+            </LinearLayout>
+
+            <!-- Reportes Stats -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Reportes Generados"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:id="@+id/tvCountReportes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textStyle="bold"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progressReportes"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:max="50"
+                    android:progress="0"
+                    android:progressTint="#FF9800"/>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -178,7 +315,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="Versión 2.0.0"
+        android:text="Versión 3.0.0"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"

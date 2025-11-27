@@ -53,7 +53,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ReportesFragment extends Fragment implements ReportesAdapter.OnItemClickListener, ReportesAdapter.OnMaquinariaStatusChangeListener, ReportesAdapter.OnMaquinariaDeleteListener, ReparacionesDialogAdapter.OnReparacionDeleteListener, ReparacionesDialogAdapter.OnRepuestoDeleteFromDialogListener {
+public class ReportesFragment extends Fragment
+        implements ReportesAdapter.OnItemClickListener, ReportesAdapter.OnMaquinariaStatusChangeListener,
+        ReportesAdapter.OnMaquinariaDeleteListener, ReparacionesDialogAdapter.OnReparacionDeleteListener,
+        ReparacionesDialogAdapter.OnRepuestoDeleteFromDialogListener {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     private ReportesViewModel reportesViewModel;
@@ -65,7 +68,8 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reportes, container, false);
 
         reportesViewModel = new ViewModelProvider(this).get(ReportesViewModel.class);
@@ -85,7 +89,8 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
         });
 
         MaterialCheckBox checkboxSelectAll = view.findViewById(R.id.checkbox_select_all_operative);
-        checkboxSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> reportesViewModel.setSelectAllOperative(isChecked));
+        checkboxSelectAll.setOnCheckedChangeListener(
+                (buttonView, isChecked) -> reportesViewModel.setSelectAllOperative(isChecked));
 
         observeViewModel();
 
@@ -122,7 +127,8 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
             }
         };
 
-        reportesViewModel.getReparacionesDeMaquina(maquinaria.getDocumentId()).observe(getViewLifecycleOwner(), reparacionesObserver);
+        reportesViewModel.getReparacionesDeMaquina(maquinaria.getDocumentId()).observe(getViewLifecycleOwner(),
+                reparacionesObserver);
     }
 
     private void startLocalExportProcess(List<Maquinaria> selectedMaquinas) {
@@ -179,7 +185,8 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
         builder.setPositiveButton("Cerrar", (dialog, which) -> {
             // Detener el observer cuando se cierra el diálogo
             if (maquinaActual != null && reparacionesObserver != null) {
-                reportesViewModel.getReparacionesDeMaquina(maquinaActual.getDocumentId()).removeObserver(reparacionesObserver);
+                reportesViewModel.getReparacionesDeMaquina(maquinaActual.getDocumentId())
+                        .removeObserver(reparacionesObserver);
             }
             dialog.dismiss();
         });
@@ -192,67 +199,75 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
     public void onReparacionDelete(Reparacion reparacion) {
         if (maquinaActual != null) {
             new AlertDialog.Builder(requireContext())
-                .setTitle("Eliminar Reparación")
-                .setMessage("¿Estás seguro de que quieres eliminar esta reparación? Esta acción no se puede deshacer.")
-                .setPositiveButton("Sí, Eliminar", (dialog, which) -> {
-                    reportesViewModel.deleteReparacion(reparacion.getDocumentId(), maquinaActual.getDocumentId());
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
+                    .setTitle("Eliminar Reparación")
+                    .setMessage(
+                            "¿Estás seguro de que quieres eliminar esta reparación? Esta acción no se puede deshacer.")
+                    .setPositiveButton("Sí, Eliminar", (dialog, which) -> {
+                        reportesViewModel.deleteReparacion(reparacion.getDocumentId(), maquinaActual.getDocumentId());
+                    })
+                    .setNegativeButton("Cancelar", null)
+                    .show();
         }
     }
 
     @Override
     public void onRepuestoDelete(Reparacion reparacion, String parteNombre, Repuesto repuesto) {
-        reportesViewModel.eliminarRepuestoDeReparacion(maquinaActual.getDocumentId(), reparacion.getDocumentId(), parteNombre, repuesto);
+        reportesViewModel.eliminarRepuestoDeReparacion(maquinaActual.getDocumentId(), reparacion.getDocumentId(),
+                parteNombre, repuesto);
     }
 
     @Override
     public void onStatusChange(Maquinaria maquinaria) {
         String nuevoEstado = maquinaria.isEstado() ? "No Operativa" : "Operativa";
         new AlertDialog.Builder(requireContext())
-            .setTitle("Cambiar Estado")
-            .setMessage("¿Estás seguro de que quieres cambiar el estado de " + maquinaria.getNombre() + " a " + nuevoEstado + "?")
-            .setPositiveButton("Sí, Cambiar", (dialog, which) -> {
-                reportesViewModel.cambiarEstadoMaquinaria(maquinaria);
-            })
-            .setNegativeButton("Cancelar", null)
-            .show();
+                .setTitle("Cambiar Estado")
+                .setMessage("¿Estás seguro de que quieres cambiar el estado de " + maquinaria.getNombre() + " a "
+                        + nuevoEstado + "?")
+                .setPositiveButton("Sí, Cambiar", (dialog, which) -> {
+                    reportesViewModel.cambiarEstadoMaquinaria(maquinaria);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     @Override
     public void onDelete(Maquinaria maquinaria) {
         new AlertDialog.Builder(requireContext())
-            .setTitle("Eliminar Reporte Completo")
-            .setMessage("¿Estás seguro de que quieres eliminar todos los reportes de " + maquinaria.getNombre() + "? La maquinaria no se eliminará, solo su historial de reparaciones.")
-            .setPositiveButton("Sí, Eliminar Reportes", (dialog, which) -> {
-                reportesViewModel.eliminarReporteCompleto(maquinaria);
-            })
-            .setNegativeButton("Cancelar", null)
-            .show();
+                .setTitle("Eliminar Reporte Completo")
+                .setMessage("¿Estás seguro de que quieres eliminar todos los reportes de " + maquinaria.getNombre()
+                        + "? La maquinaria no se eliminará, solo su historial de reparaciones.")
+                .setPositiveButton("Sí, Eliminar Reportes", (dialog, which) -> {
+                    reportesViewModel.eliminarReporteCompleto(maquinaria);
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 
     private boolean checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             return true;
         } else {
-            return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+            return ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
     }
 
     private void requestPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, PERMISSION_REQUEST_CODE);
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 reportesViewModel.onExportExcelClicked();
             } else {
-                Toast.makeText(getContext(), "Permiso denegado. No se puede guardar el archivo.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Permiso denegado. No se puede guardar el archivo.", Toast.LENGTH_SHORT)
+                        .show();
             }
         }
     }
@@ -284,21 +299,28 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
-                contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/Reportes Reparaciones Maquina");
-                Uri uri = requireContext().getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues);
-                if (uri == null) throw new IOException("No se pudo crear el archivo en MediaStore");
+                contentValues.put(MediaStore.MediaColumns.MIME_TYPE,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH,
+                        Environment.DIRECTORY_DOWNLOADS + "/Reportes Reparaciones Maquina");
+                Uri uri = requireContext().getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                        contentValues);
+                if (uri == null)
+                    throw new IOException("No se pudo crear el archivo en MediaStore");
                 fos = requireContext().getContentResolver().openOutputStream(uri);
                 pathForToast = "Guardado en Descargas.";
             } else {
-                File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Reportes Reparaciones Maquina");
-                if (!dir.exists()) dir.mkdirs();
+                File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                        "Reportes Reparaciones Maquina");
+                if (!dir.exists())
+                    dir.mkdirs();
                 File file = new File(dir, fileName);
                 fos = new FileOutputStream(file);
                 pathForToast = file.getAbsolutePath();
             }
 
-            if (fos == null) throw new IOException("El stream de salida es nulo.");
+            if (fos == null)
+                throw new IOException("El stream de salida es nulo.");
 
             try (OutputStream finalFos = fos) {
                 workbook.write(finalFos);
@@ -307,6 +329,7 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
             }
 
             Toast.makeText(getContext(), "Excel " + pathForToast, Toast.LENGTH_LONG).show();
+            com.example.proyectoandroid.util.UserActionLogger.logCreateReporte(fileName);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -358,13 +381,16 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
         subHeaderStyle.setBorderRight(BorderStyle.THIN);
 
         for (Reparacion reparacion : reparaciones) {
-            String[] mainHeaders = {"ID Máquina", "Nombre Máquina", "Fecha de Reparación", "Notas"};
-            String fechaReparacionStr = (reparacion.getFecha() != null) ? new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(reparacion.getFecha().toDate()) : "";
+            String[] mainHeaders = { "ID Máquina", "Nombre Máquina", "Fecha de Reparación", "Notas" };
+            String fechaReparacionStr = (reparacion.getFecha() != null)
+                    ? new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                            .format(reparacion.getFecha().toDate())
+                    : "";
             String[] mainData = {
-                maquina.getNumeroIdentificador(),
-                maquina.getNombre(),
-                fechaReparacionStr,
-                reparacion.getNotas()
+                    maquina.getNumeroIdentificador(),
+                    maquina.getNombre(),
+                    fechaReparacionStr,
+                    reparacion.getNotas()
             };
 
             for (int i = 0; i < mainHeaders.length; i++) {
@@ -377,7 +403,7 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
                 dataCell.setCellValue(mainData[i]);
                 dataCell.setCellStyle(dataCellStyle);
             }
-            
+
             rowNum++;
 
             if (reparacion.getPartesReparadas() != null && !reparacion.getPartesReparadas().isEmpty()) {
@@ -389,7 +415,7 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
                     sheet.addMergedRegion(new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 2));
 
                     Row repuestoHeaderRow = sheet.createRow(rowNum++);
-                    String[] repuestoHeaders = {"Nombre", "Código/N parte", "Cantidad"};
+                    String[] repuestoHeaders = { "Nombre", "Código/N parte", "Cantidad" };
                     for (int i = 0; i < repuestoHeaders.length; i++) {
                         Cell cell = repuestoHeaderRow.createCell(i);
                         cell.setCellValue(repuestoHeaders[i]);
@@ -412,7 +438,7 @@ public class ReportesFragment extends Fragment implements ReportesAdapter.OnItem
                     rowNum++;
                 }
             }
-            rowNum += 2; 
+            rowNum += 2;
         }
     }
 }

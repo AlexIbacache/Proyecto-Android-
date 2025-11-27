@@ -13,9 +13,11 @@ import com.example.proyectoandroid.util.UserActionLogger;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
@@ -293,5 +295,58 @@ public class MaquinariaRepository {
                             .addOnFailureListener(e -> callback.onComplete(false));
                 })
                 .addOnFailureListener(e -> callback.onComplete(false));
+    }
+
+    public interface ReparacionStatsCallback {
+        void onStatsLoaded(int abiertas, int cerradas);
+    }
+
+    public void getReparacionStats(String userId, ReparacionStatsCallback callback) {
+        if (userId == null) {
+            callback.onStatsLoaded(0, 0);
+            return;
+        }
+
+        db.collection("users").document(userId).collection("maquinaria")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        callback.onStatsLoaded(0, 0);
+                        return;
+                    }
+
+                    List<Task<QuerySnapshot>> tasks = new ArrayList<>();
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        tasks.add(doc.getReference().collection("reparaciones").get());
+                    }
+
+                    com.google.android.gms.tasks.Tasks.whenAllSuccess(tasks)
+                            .addOnSuccessListener(objects -> {
+                                int abiertas = 0;
+                                int cerradas = 0;
+
+                                for (Object obj : objects) {
+                                    QuerySnapshot snapshot = (QuerySnapshot) obj;
+                                    for (DocumentSnapshot repDoc : snapshot.getDocuments()) {
+                                        String estado = repDoc.getString("estado");
+                                        if ("Abierta".equals(estado)) {
+                                            abiertas++;
+                                        } else if ("Cerrada".equals(estado)) {
+                                            cerradas++;
+                                        }
+                                    }
+                                }
+                                callback.onStatsLoaded(abiertas, cerradas);
+                            })
+                            .addOnFailureListener(e -> {
+                                android.util.Log.e("MaquinariaRepository",
+                                        "Error al cargar estadísticas de reparaciones", e);
+                                callback.onStatsLoaded(0, 0);
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("MaquinariaRepository", "Error al obtener maquinaria para estadísticas", e);
+                    callback.onStatsLoaded(0, 0);
+                });
     }
 }
