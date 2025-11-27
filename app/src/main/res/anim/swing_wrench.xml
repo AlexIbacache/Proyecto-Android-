@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true">
+    
+    <!-- Rotación de la llave -->
+    <rotate
+        android:duration="1500"
+        android:fromDegrees="-15"
+        android:toDegrees="15"
+        android:pivotX="20%"
+        android:pivotY="80%"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"/>
+    
+    <!-- Fade in inicial -->
+    <alpha
+        android:duration="800"
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0"
+        android:interpolator="@android:anim/accelerate_interpolator"/>
+</set>
