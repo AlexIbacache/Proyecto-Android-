@@ -241,3 +241,6 @@ El proyecto utiliza las siguientes tecnologías y dependencias clave:
 *   **Modo Offline:** Persistencia local con Room para trabajar sin conexión.
 *   **Gráficos Avanzados:** Implementar MPAndroidChart para estadísticas históricas más detalladas.
 *   **Chat Técnico:** Comunicación en tiempo real entre administradores y técnicos.
+
+---
+*    **Link de Documentación:** https://drive.google.com/drive/folders/1ukdKRbC2Jni99Bzh0Iavmv2h-Ph46o0k?usp=sharing
